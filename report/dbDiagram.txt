@@ -1,0 +1,93 @@
+//// -- LEVEL 1
+//// -- Schemas, Tables and References
+
+// Creating tables
+// You can define the tables with full schema names
+Table Book {
+  ISBN int [PK]
+  name varchar
+  genre varchar
+  numberOfPages int
+  price numeric(6,2)
+  commission numeric(3,2)
+  stock int
+  publisherID varchar
+  
+}
+
+Table BookAuthors {
+  ISBN int [PK]
+  authorID int [PK]
+
+}
+  // You can also define relaionship separately
+// > many-to-one; < one-to-many; - one-to-one; <> many-to-many
+Ref: Book.ISBN <> BookAuthors.ISBN  
+Ref: Author.authorID <> BookAuthors.authorID
+
+
+Table Author {
+  authorID int [PK]
+  fName varchar
+  lName varchar
+}
+
+Table Order {
+  orderNumber int [PK]
+  shippingAddress varchar
+  courier varchar
+  deliveryStatus boolean
+  locationInTransit varchar
+  time  datetime
+  userID int 
+}
+
+Ref: User.userID < Order.userID
+
+Table BookOrders {
+  orderNumber int [PK]
+  ISBN int [PK]
+}
+
+Ref: Book.ISBN <> BookOrders.ISBN  
+Ref: Order.orderNumber <> BookOrders.orderNumber
+
+Table Publisher {
+  publisherID int [PK]
+  fName varchar
+  lName varchar
+  address varchar
+  email varchar
+  phoneNumber varchar
+}
+
+Ref: Book.publisherID > Publisher.publisherID
+Ref: "Book"."ISBN" < "Book"."numberOfPages"
+
+Table User {
+  userID int
+  fName varchar
+  lName varchar 
+  email varchar
+  address varchar
+  street varchar
+}
+
+Table UserCards {
+  userID int
+  cardNumber varchar
+  cardHolderName varchar
+  expiryDate date
+  securityCode int
+}
+
+Table UserBookSelections {
+  userID int
+  ISBN int
+  quantity int
+}
+
+Ref: User.userID <> UserBookSelections.userID
+Ref: Book.ISBN <> UserBookSelections.ISBN 
+
+Ref: UserCards.userID > User.userID
