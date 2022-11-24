@@ -47,6 +47,7 @@ Ref: User.userID < Order.userID
 Table BookOrders {
   orderNumber int [PK]
   ISBN int [PK]
+  quantity int
 }
 
 Ref: Book.ISBN <> BookOrders.ISBN  
@@ -54,15 +55,13 @@ Ref: Order.orderNumber <> BookOrders.orderNumber
 
 Table Publisher {
   publisherID int [PK]
-  fName varchar
-  lName varchar
+  name  varchar
   address varchar
   email varchar
   phoneNumber varchar
 }
 
 Ref: Book.publisherID > Publisher.publisherID
-Ref: "Book"."ISBN" < "Book"."numberOfPages"
 
 Table User {
   userID int
@@ -74,11 +73,12 @@ Table User {
 }
 
 Table UserCards {
-  userID int
-  cardNumber varchar
+  cardNumber varchar [PK]
   cardHolderName varchar
   expiryDate date
   securityCode int
+  userID int
+
 }
 
 Table UserBookSelections {
