@@ -5,11 +5,13 @@ import { useState } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import { useNavigate } from "react-router-dom";
 
 function ModeSelect() {
+    let navigate = useNavigate();
+
     // TODO: get usersList from backend
     let usersList = ['root',
-        'admin',
         'test',
         'guest',
         'info',
@@ -44,6 +46,7 @@ function ModeSelect() {
         
         // TODO: register user endpoint on currUserAdd
         alert("userAdded: " + currUserAdd);
+        navigate("/userHome");
     }
 
     const goToUserHome = () => {
@@ -52,8 +55,10 @@ function ModeSelect() {
             return;
         }
         alert ("go to user: " + currUser);
-
         //TODO: set current user (cookie? db?)
+
+
+        navigate("/userHome");
     }
 
 
