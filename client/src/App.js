@@ -24,7 +24,7 @@ function App() {
                 <Routes>
                     <Route path='/' element={<ModeSelect />} />
                     <Route path='/admin' element={<AdminHome />} />
-                    <Route path='/home' element={<UserHome />} />
+                    <Route path='/userHome' element={<UserHome />} />
 
                 </Routes>
             </BrowserRouter>
