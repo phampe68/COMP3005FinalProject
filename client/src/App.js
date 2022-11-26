@@ -1,11 +1,35 @@
-import logo from './logo.svg';
+import * as React from 'react';
+
 import './App.css';
-import { Route, Routes} from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import AdminHome from "./pages/AdminHome";
+import UserHome from "./pages/UserHome";
+import ModeSelect from "./pages/ModeSelect";
+
+
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+const darkTheme = createTheme({
+    palette: {
+        mode: 'dark',
+    },
+});
 
 function App() {
-  return <Routes>
-    <Route path="" element=<Home/>>
-  </Routes>
+    return (
+        <ThemeProvider theme={darkTheme}>
+            <CssBaseline />
+            <BrowserRouter>
+                <Routes>
+                    <Route path='/' element={<ModeSelect />} />
+                    <Route path='/admin' element={<AdminHome />} />
+                    <Route path='/home' element={<UserHome />} />
+
+                </Routes>
+            </BrowserRouter>
+        </ThemeProvider>
+    );
 }
 
 export default App;
