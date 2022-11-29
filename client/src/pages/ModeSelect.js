@@ -36,7 +36,7 @@ function ModeSelect() {
     const [currUserAdd, setCurrUserAdd] = useState("");
 
     const addUser = () => {
-        if (currUserAdd == "") {
+        if (currUserAdd === "") {
             alert("Add User field is empty");
             return;
         } else if (usersList.includes(currUserAdd)) {
@@ -50,13 +50,14 @@ function ModeSelect() {
     }
 
     const goToUserHome = () => {
-        if (currUser == "" || !currUser ) {
+        if (!currUser ) {
             alert("No user selected.");
             return;
         }
         alert ("go to user: " + currUser);
         //TODO: set current user (cookie? db?)
-
+        
+        localStorage.setItem('user', currUser)
 
         navigate("/userHome");
     }
