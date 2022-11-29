@@ -13,7 +13,42 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
+const booksFromGet = [
+    {
+        ISBN: 123456,
+        name: "Harry Potter",
+        authorName: "JK Rowling",
+        publisherName: "Penguin",
+        genres: ["Magic", "Adventure", "Mystery"],
+        price: 20
+    },
+    {
+        ISBN: 123457,
+        name: "Harry Potter",
+        authorName: "JK Rowling",
+        publisherName: "Penguin",
+        genres: ["Magic", "Adventure", "Mystery"],
+        price: 20
 
+    },
+    {
+        ISBN: 123458,
+        name: "Harry Potter",
+        authorName: "JK Rowling",
+        publisherName: "Penguin",
+        genres: ["Magic", "Adventure", "Mystery"],
+        price: 20
+
+    },
+    {
+        ISBN: 123459,
+        name: "Harry Potter",
+        authorName: "JK Rowling",
+        publisherName: "Penguin",
+        genres: ["Magic", "Adventure", "Mystery"],
+        price: 20
+    },
+]
 
 
 /*
@@ -25,45 +60,13 @@ function UserHome() {
 
     const [currGenre, setCurrGenre] = useState("");
     const [genres, setGenres] = useState([]);
-    const [cart, setCart] = useState([]); // list of ISBNs of user cart
 
-    const [selectedBookCards, setSelectedBookCards] = useState({});
+
+
+    const [selectedBooks, setSelectedBooks] = useState([]);
 
     const [booksFound, setBooksFound] = useState([
-        {
-            ISBN: 123456,
-            name: "Harry Potter",
-            authorName: "JK Rowling",
-            publisherName: "Penguin",
-            genres: ["Magic", "Adventure", "Mystery"],
-            price: 20
-        },
-        {
-            ISBN: 123456,
-            name: "Harry Potter",
-            authorName: "JK Rowling",
-            publisherName: "Penguin",
-            genres: ["Magic", "Adventure", "Mystery"],
-            price: 20
-
-        },
-        {
-            ISBN: 123456,
-            name: "Harry Potter",
-            authorName: "JK Rowling",
-            publisherName: "Penguin",
-            genres: ["Magic", "Adventure", "Mystery"],
-            price: 20
-
-        },
-        {
-            ISBN: 123456,
-            name: "Harry Potter",
-            authorName: "JK Rowling",
-            publisherName: "Penguin",
-            genres: ["Magic", "Adventure", "Mystery"],
-            price: 20
-        },
+        ...booksFromGet
     ]);
 
     const addGenre = (e) => {
@@ -86,16 +89,19 @@ function UserHome() {
 
 
     const BookCard = (props) => {
-
+        let selected = selectedBooks.includes(props.book.ISBN);
         const addToCart = (e) => {
-            //TODO: index book cards
-            // TODO: make post request to add to cart by sending all ISBNs and current user
-            setCart([...cart, props.book.ISBN]);
-
+            if (!selected) {
+                // TODO: make post request to add to cart by sending all ISBNs and current user
+                setSelectedBooks([...selectedBooks, props.book.ISBN]);
+            } else {
+                let temp = selectedBooks.filter((item) => (item != props.book.ISBN));
+                setSelectedBooks(temp);
+            }
 
         }
         return (
-            <Card sx={{ minWidth: 275 }}>
+            <Card sx={{ minWidth: 275, borderColor: "primary.main", border: selected ? 1 : 0 }}>
                 <CardContent>
                     <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                         {"ISBN: " + props.book.ISBN}
@@ -112,7 +118,13 @@ function UserHome() {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button size="small" onClick={addToCart} >Add to Cart</Button>
+                    <Button size="small" onClick={addToCart} variant="outlined" color={selected ? "error" : "primary"}>
+                        <Typography variant="body1" component="div">
+                            {selected ? "Remove from cart" : "Add to cart"}
+                        </Typography>
+
+
+                    </Button>
                 </CardActions>
             </Card>
         )
@@ -176,10 +188,10 @@ function UserHome() {
 
 
             <Grid style={{ marginTop: "5px", width: "100%", paddingBottom: "2%", alignItems: "center" }} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-       
+
 
                 {booksFound.map((book, index) => (
-                    
+
                     <Grid item xs={2} sm={4} md={4} key={index}>
                         <BookCard book={book} index={index} />
                     </Grid>
