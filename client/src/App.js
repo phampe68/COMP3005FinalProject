@@ -5,7 +5,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AdminHome from "./pages/AdminHome";
 import UserHome from "./pages/UserHome";
 import ModeSelect from "./pages/ModeSelect";
-
+import Checkout from "./pages/checkout";
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -25,8 +25,8 @@ function App() {
                     <Route path='/' element={<ModeSelect />} />
                     <Route path='/admin' element={<AdminHome />} />
                     <Route path='/userHome' element={<UserHome />} />
-
-                </Routes>
+                    <Route path='/checkout' element={<Checkout />} />
+                 </Routes>
             </BrowserRouter>
         </ThemeProvider>
     );

@@ -12,6 +12,11 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import { useNavigate } from "react-router-dom";
+import OrderCard from '../components/orderCard';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
 
 const booksFromGet = [
     {
@@ -50,18 +55,45 @@ const booksFromGet = [
     },
 ]
 
+const myOrders = [
+    {
+        orderNumber: 1,
+        shippingAddress: "100 example drive",
+        courier: "FEDEX",
+        deliveryStatus: "In transit",
+        locationInTransit: "Toronto",
+        time: "12/24/21"
+    },
+    {
+        orderNumber: 1,
+        shippingAddress: "100 example drive",
+        courier: "FEDEX",
+        deliveryStatus: "In transit",
+        locationInTransit: "Toronto",
+        time: "12/24/21"
+    },
+    {
+        orderNumber: 1,
+        shippingAddress: "100 example drive",
+        courier: "FEDEX",
+        deliveryStatus: "In transit",
+        locationInTransit: "Toronto",
+        time: "12/24/21"
+    },
+
+];
 
 /*
 Page that lets you search books and shows a bunch of books 
 */
 function UserHome() {
+    let navigate = useNavigate();
+
     const [searchField, setSearchField] = useState("");
     const [searchBy, setSearchBy] = useState(""); //which field to saerch by (ISBN, name, author name, publisher)
 
     const [currGenre, setCurrGenre] = useState("");
     const [genres, setGenres] = useState([]);
-
-
 
     const [selectedBooks, setSelectedBooks] = useState([]);
 
@@ -135,7 +167,6 @@ function UserHome() {
             <div style={{ display: "flex", flexDirection: "column" }}>
 
                 <h1>User Home Page</h1>
-
                 {/* search section */}
                 <h2>Search Books</h2>
                 <div style={{ display: "flex" }}>
@@ -159,6 +190,8 @@ function UserHome() {
 
                         </RadioGroup>
                     </FormControl>
+
+
                 </div>
 
                 {/* add genre section */}
@@ -185,7 +218,23 @@ function UserHome() {
 
             </div>
 
+            <div>
+                <h2> Orders </h2>
+                <Grid style={{ marginTop: "5px", width: "50%" }} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
 
+                    {myOrders.map((order, index) => (
+                        <Grid item xs={2} sm={4} md={4} key={index}>
+
+                            <OrderCard order={order} />
+                        </Grid>
+
+                    ))}
+
+                </Grid>
+
+
+
+            </div>
 
             <Grid style={{ marginTop: "5px", width: "100%", paddingBottom: "2%", alignItems: "center" }} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
 
@@ -197,6 +246,10 @@ function UserHome() {
                     </Grid>
                 ))}
             </Grid>
+
+            <div style={{ display: "flex", alignItems: "center" }}>
+                <Button onClick={() => { navigate('/checkout'); }} variant="outlined" style={{ minHeight: '80px' }}> Checkout </Button>
+            </div>
         </div>
     )
 
