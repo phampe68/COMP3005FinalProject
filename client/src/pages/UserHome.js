@@ -108,7 +108,6 @@ function UserHome() {
 
     const BookCard = (props) => {
         const [quantity, setQuantity] = useState(0);
-        const [selected, setSelected] = useState(false);
 
         const handleIncrement = (ISBN) => {
             setQuantity(quantity + 1);
@@ -121,15 +120,14 @@ function UserHome() {
 
         const addToCart = (e) => {
             if (quantity === 0) return;
-            setSelected(!selected);
 
             axios.post('http://localhost:5000/selections', {
-                userid: user,
+                userID: user,
                 isbn: props.book.isbn,
                 quantity: quantity,
-                adding: !selected
             })
                 .then(function (response) {
+                    setQuantity(0);
                     console.log(response);
                 })
                 .catch(function (error) {
@@ -138,7 +136,7 @@ function UserHome() {
         }
         
         return (
-            <Card sx={{ minWidth: 275, borderColor: "primary.main", border: selected ? 1 : 0 }}>
+            <Card sx={{ minWidth: 275, borderColor: "primary.main"}}>
                 <CardContent>
                     <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                         {"ISBN: " + props.book.isbn}
@@ -162,12 +160,10 @@ function UserHome() {
                         }</Button>
                         <Button onClick={() => { handleDecrement(props.book.ISBN) }}>-</Button>
                     </ButtonGroup>
-                    <Button size="small" onClick={addToCart} variant="outlined" color={selected ? "error" : "primary"}>
+                    <Button size="small" onClick={addToCart} variant="outlined" >
                         <Typography variant="body1" component="div">
-                            {selected ? "Remove from cart" : "Add to cart"}
+                            {"Add to cart"}
                         </Typography>
-
-
                     </Button>
                 </CardActions>
             </Card>
