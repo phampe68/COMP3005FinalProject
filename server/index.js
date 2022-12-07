@@ -264,12 +264,13 @@ app.post('/selections/', async(req,res)=>{
 }
 );
 
-//checkout book selections
-app.post('/selections/', async(req,res)=>{
+//get book selections
+app.get('/selections/id', async(req,res)=>{
     try {
-        console.log(req.body);
-        const {userid,isbn,quantity}=req.body;
-        const selection = await pool.query("SELECT * FROM UserBookSelections_AddBook($1,$2,$3)",[userid,isbn,quantity]);
+        //console.log(req.body);
+        const {userID}=req.params;
+        console.log(userID);
+        const selection = await pool.query("SELECT * FROM UserBookSelections_GetById($1)",[userID]);
         res.json(selection.rows);
     } catch (err) {
         console.error(err.message);
@@ -281,8 +282,8 @@ app.post('/selections/', async(req,res)=>{
 app.delete('/selections/:id/:isbn', async(req,res)=>{
     try {
         console.log(req.params);
-        const {userid,isbn}=req.params;
-        const selection = await pool.query("SELECT * FROM UserBookSelections_Delete($1)",[userid,isbn]);
+        const {userID,isbn}=req.params;
+        const selection = await pool.query("SELECT * FROM UserBookSelections_Delete($1)",[userID,isbn]);
         res.json(selection.rows);
     } catch (err) {
         console.error(err.message);
