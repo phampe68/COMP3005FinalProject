@@ -154,7 +154,7 @@ $$
     SELECT * FROM BookAuthors WHERE ISBN = $1
 $$;
 
-CREATE OR REPLACE FUNCTION BookGenres_Register(int,varchar)
+CREATE OR REPLACE FUNCTION BookGenres_AddGenre(int,varchar)
 returns setof BookGenres
 language 'sql'
 AS
@@ -249,6 +249,14 @@ language 'sql'
 AS 
 $$
     SELECT * FROM UserBookSelections WHERE userID = $1
+$$;
+
+CREATE OR REPLACE FUNCTION UserBookSelections_GetAll()
+returns setof UserBookSelections
+language 'sql'
+AS 
+$$
+    SELECT * FROM UserBookSelections
 $$;
 
 CREATE OR REPLACE FUNCTION UserBookSelections_GetByISBN(int)

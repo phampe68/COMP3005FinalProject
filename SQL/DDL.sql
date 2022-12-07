@@ -77,22 +77,25 @@ CREATE TABLE StoreOrder(
 CREATE TABLE BookAuthors(
     authorID int,
     isbn int,
-    PRIMARY FOREIGN KEY (authorID) references Author (authorID),
-    PRIMARY FOREIGN KEY (isbn) references Book (isbn)
+    PRIMARY KEY (authorID,isbn),
+    FOREIGN KEY (authorID) references Author (authorID),
+    FOREIGN KEY (isbn) references Book (isbn)
 );
 
 CREATE TABLE BookGenres(
     genre varchar(255),
     isbn int,
-    PRIMARY FOREIGN KEY (isbn) references Book (isbn)
+    PRIMARY KEY (isbn),
+    FOREIGN KEY (isbn) references Book (isbn)
 );
 
 CREATE TABLE BookOrders(
     orderNumber int,
     isbn int,
     quantity int,
-    PRIMARY FOREIGN KEY (orderNumber) references StoreOrder (orderNumber),
-    PRIMARY FOREIGN KEY (isbn) references Book (isbn)
+    PRIMARY KEY (orderNumber,isbn),
+    FOREIGN KEY (orderNumber) references StoreOrder (orderNumber),
+    FOREIGN KEY (isbn) references Book (isbn)
 );
 
 
@@ -100,8 +103,9 @@ CREATE TABLE UserBookSelections(
     userID int,
     isbn int,
     quantity int,
-    PRIMARY FOREIGN KEY (userID) references StoreUser (userID),
-    PRIMARY FOREIGN KEY (isbn) references Book (isbn)
+    PRIMARY KEY (userID,isbn),
+    FOREIGN KEY (userID) references StoreUser (userID),
+    FOREIGN KEY (isbn) references Book (isbn)
 );
 
 \i SQL/Functions.sql
