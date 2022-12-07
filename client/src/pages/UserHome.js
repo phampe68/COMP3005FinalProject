@@ -14,44 +14,9 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { useNavigate } from "react-router-dom";
 import OrderCard from '../components/orderCard';
+import axios from 'axios';
+import ButtonGroup from '@mui/material/ButtonGroup';
 
-
-const booksFromGet = [
-    {
-        ISBN: 123456,
-        name: "Harry Potter",
-        authorName: "JK Rowling",
-        publisherName: "Penguin",
-        genres: ["Magic", "Adventure", "Mystery"],
-        price: 20
-    },
-    {
-        ISBN: 123457,
-        name: "Harry Potter",
-        authorName: "JK Rowling",
-        publisherName: "Penguin",
-        genres: ["Magic", "Adventure", "Mystery"],
-        price: 20
-
-    },
-    {
-        ISBN: 123458,
-        name: "Harry Potter",
-        authorName: "JK Rowling",
-        publisherName: "Penguin",
-        genres: ["Magic", "Adventure", "Mystery"],
-        price: 20
-
-    },
-    {
-        ISBN: 123459,
-        name: "Harry Potter",
-        authorName: "JK Rowling",
-        publisherName: "Penguin",
-        genres: ["Magic", "Adventure", "Mystery"],
-        price: 20
-    },
-]
 
 const myOrders = [
     {
@@ -81,32 +46,46 @@ const myOrders = [
 
 ];
 
+
+let order =
+{
+    userID: 2,
+    order: [
+        {
+            isbn: 13213213,
+            quantity: 2,
+        },
+        {
+            isbn: 13213213,
+            quantity: 2,
+        }
+    ]
+};
+
 /*
 Page that lets you search books and shows a bunch of books 
 */
 function UserHome() {
 
     useEffect(() => {
-        const loggedInUser = localStorage.getItem("user");
-        setUser(loggedInUser);
-        alert(loggedInUser);
+        axios.get(`http://localhost:5000/books/`).then(res => {
+            setBooksFound(res.data);
+        });
+
+
+        setUser(localStorage.getItem("user"));
     }, []);
 
 
     let navigate = useNavigate();
 
-    const [user, setUser] = useState("");
+    const [user, setUser] = useState(localStorage.getItem("user"));
     const [searchField, setSearchField] = useState("");
     const [searchBy, setSearchBy] = useState(""); //which field to saerch by (ISBN, name, author name, publisher)
 
     const [currGenre, setCurrGenre] = useState("");
     const [genres, setGenres] = useState([]);
-
-    const [selectedBooks, setSelectedBooks] = useState([]);
-
-    const [booksFound, setBooksFound] = useState([
-        ...booksFromGet
-    ]);
+    const [booksFound, setBooksFound] = useState([]);
 
     const addGenre = (e) => {
         if (!currGenre || genres.includes(currGenre)) return;
@@ -128,22 +107,41 @@ function UserHome() {
 
 
     const BookCard = (props) => {
-        let selected = selectedBooks.includes(props.book.ISBN);
-        const addToCart = (e) => {
-            if (!selected) {
-                // TODO: make post request to add to cart by sending all ISBNs and current user
-                setSelectedBooks([...selectedBooks, props.book.ISBN]);
-            } else {
-                let temp = selectedBooks.filter((item) => (item != props.book.ISBN));
-                setSelectedBooks(temp);
-            }
+        const [quantity, setQuantity] = useState(0);
+        const [selected, setSelected] = useState(false);
+
+        const handleIncrement = (ISBN) => {
+            setQuantity(quantity + 1);
+        }
+
+        const handleDecrement = (ISBN) => {
+            setQuantity(quantity + 1);
 
         }
+
+        const addToCart = (e) => {
+            if (quantity === 0) return;
+            setSelected(!selected);
+
+            axios.post('http://localhost:5000/selections', {
+                userid: user,
+                isbn: props.book.isbn,
+                quantity: quantity,
+                adding: !selected
+            })
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+        
         return (
             <Card sx={{ minWidth: 275, borderColor: "primary.main", border: selected ? 1 : 0 }}>
                 <CardContent>
                     <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                        {"ISBN: " + props.book.ISBN}
+                        {"ISBN: " + props.book.isbn}
                     </Typography>
                     <Typography variant="h5" component="div">
                         {props.book.name}
@@ -157,6 +155,13 @@ function UserHome() {
                     </Typography>
                 </CardContent>
                 <CardActions>
+                    <ButtonGroup size="small" aria-label="small outlined button group" >
+                        <Button onClick={() => { handleIncrement(props.book.ISBN) }}>+</Button>
+                        <Button>{
+                            quantity
+                        }</Button>
+                        <Button onClick={() => { handleDecrement(props.book.ISBN) }}>-</Button>
+                    </ButtonGroup>
                     <Button size="small" onClick={addToCart} variant="outlined" color={selected ? "error" : "primary"}>
                         <Typography variant="body1" component="div">
                             {selected ? "Remove from cart" : "Add to cart"}
