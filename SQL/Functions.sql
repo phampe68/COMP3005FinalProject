@@ -120,6 +120,38 @@ $$
     INSERT INTO BookAuthors (isbn, authorID) VALUES ($1,$2) RETURNING *;
 $$;
 
+CREATE OR REPLACE FUNCTION BookGenres_Register(int,varchar)
+returns setof BookGenres
+language 'sql'
+AS
+$$
+    INSERT INTO BookGenres (isbn, genre) VALUES ($1,$2) RETURNING *;
+$$;
+
+CREATE OR REPLACE FUNCTION BookOrders_Register(int,int,int)
+returns setof BookOrders
+language 'sql'
+AS
+$$
+    INSERT INTO BookOrders (orderNumber,isbn,quantity) VALUES ($1,$2,$3) RETURNING *;
+$$;
+
+CREATE OR REPLACE FUNCTION BookOrders_Remove(int)
+returns setof BookOrders
+language 'sql'
+AS
+$$
+    DELETE FROM BookOrders where orderNumber=$1 RETURNING *;
+$$;
+
+CREATE OR REPLACE FUNCTION BookOrders_GetByID(int)
+returns setof BookOrders
+language 'sql'
+AS 
+$$
+    SELECT * FROM BookOrders WHERE isbn = $1
+$$;
+
 CREATE OR REPLACE FUNCTION UserBookSelections_AddBook(int,int,int)
 returns setof UserBookSelections
 language 'sql'
@@ -142,5 +174,21 @@ language 'sql'
 AS 
 $$
     SELECT * FROM UserBookSelections WHERE userID = $1
+$$;
+
+CREATE OR REPLACE FUNCTION UserBookSelections_GetByISBN(int)
+returns setof UserBookSelections
+language 'sql'
+AS 
+$$
+    SELECT * FROM UserBookSelections WHERE isbn = $1
+$$;
+
+CREATE OR REPLACE FUNCTION Book_GetRemoveable()
+returns setof Book
+language 'sql'
+AS 
+$$
+    SELECT * FROM Book WHERE Book.isbn not in (select isbn from BookOrders) and Book.isbn not in (select isbn from UserBookSelections)
 $$;
 
