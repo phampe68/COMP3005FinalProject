@@ -278,7 +278,7 @@ app.get('/selections/:id', async(req,res)=>{
         let books =[];
         for (let i=0;i<selection.rows.length;i++){
             const book = await pool.query("SELECT * FROM Book_GetById($1)",[selection.rows[i].isbn]);
-            books[i] = book.rows[0]
+            books[i] = [selection.rows[i],book.rows[0]]
         }
 
         res.json(books);
@@ -293,7 +293,7 @@ app.get('/selections/:id', async(req,res)=>{
 //get book selections
 app.get('/selections/', async(req,res)=>{
     try {
-        const selection = await pool.query("SELECT * FROM UserBookSelections");
+        const selection = await pool.query("SELECT * FROM UserBookSelections_GetAll()");
         let books = [];
         console.log(selection.rows.length)
         for (let i=0;i<selection.rows.length;i++){
