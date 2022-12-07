@@ -120,6 +120,22 @@ $$
     INSERT INTO BookAuthors (isbn, authorID) VALUES ($1,$2) RETURNING *;
 $$;
 
+CREATE OR REPLACE FUNCTION BookAuthors_GetByAuthor(int)
+returns setof BookAuthors
+language 'sql'
+AS 
+$$
+    SELECT * FROM BookAuthors WHERE authorID = $1
+$$;
+
+CREATE OR REPLACE FUNCTION BookAuthors_GetByBook(int)
+returns setof BookAuthors
+language 'sql'
+AS 
+$$
+    SELECT * FROM BookAuthors WHERE ISBN = $1
+$$;
+
 CREATE OR REPLACE FUNCTION BookGenres_Register(int,varchar)
 returns setof BookGenres
 language 'sql'

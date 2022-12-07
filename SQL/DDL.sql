@@ -1,10 +1,13 @@
 DROP TABLE IF EXISTS Publisher CASCADE;
 DROP TABLE IF EXISTS StoreUser CASCADE;
+DROP TABLE IF EXISTS UserCards CASCADE;
 DROP TABLE IF EXISTS Author CASCADE;
 DROP TABLE IF EXISTS Book CASCADE;
 DROP TABLE IF EXISTS BookAuthors CASCADE;
 DROP TABLE IF EXISTS BookOrders CASCADE;
 DROP TABLE IF EXISTS UserBookSelections CASCADE;
+DROP TABLE IF EXISTS StoreOrder CASCADE;
+DROP TABLE IF EXISTS BookGenres CASCADE;
 
 CREATE TABLE Publisher(
     publisherID SERIAL,
@@ -36,7 +39,7 @@ CREATE TABLE UserCards(
     userID SERIAL,
     cardHolderName VARCHAR (255),
     cardNumber VARCHAR (255),
-    expiryDate VARCHAR (255),
+    expiryDate timestamp,
     securityCode INT,
     PRIMARY KEY (cardNumber),
     FOREIGN KEY (userID) references StoreUser (userID)

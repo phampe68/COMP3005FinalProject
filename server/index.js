@@ -208,12 +208,26 @@ app.post('/bookauthors/', async(req,res)=>{
 }
 );
 
-//find author(s) of a book
+
+//find book(s) by an author
 app.get('/bookauthors/author/id', async(req,res)=>{
     try {
         console.log(req.body);
-        const {authorID,isbn}=req.body;
-        const selection = await pool.query("SELECT * FROM BookAuthors_GetByAuthor($1)",[authorID,isbn]);
+        const {authorID}=req.body;
+        const selection = await pool.query("SELECT * FROM BookAuthors_GetByAuthor($1)",[authorID]);
+        res.json(selection.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+);
+
+//find author(s) of a book
+app.get('/bookauthors/book/id', async(req,res)=>{
+    try {
+        console.log(req.body);
+        const {isbn}=req.body;
+        const selection = await pool.query("SELECT * FROM BookAuthors_GetByBook($1)",[isbn]);
         res.json(selection.rows);
     } catch (err) {
         console.error(err.message);
