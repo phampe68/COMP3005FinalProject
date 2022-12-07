@@ -64,6 +64,14 @@ $$
     INSERT INTO Author (fName,lName) VALUES ($1,$2) RETURNING *;
 $$;
 
+CREATE OR REPLACE FUNCTION Author_GetAll()
+returns setof Author
+language 'sql'
+AS 
+$$
+    SELECT * FROM Author;
+$$;
+
 CREATE OR REPLACE FUNCTION Author_GetByID(int)
 returns setof Author
 language 'sql'
@@ -97,12 +105,19 @@ $$
 $$;
 
 CREATE OR REPLACE FUNCTION Book_Remove(int)
-returns setof Book
+returns Boolean
 language 'sql'
 AS
 $$
-    DELETE FROM Book where isbn=$1 RETURNING *;
-$$;
+BEGIN
+    IF ($1 is in (select isbn from Book_GetRemovable())) THEN
+        BEGIN
+        DELETE FROM BookAuthors where isbn=$1;
+        DELETE FROM Book b where b.isbn=$1 RETURNING True;
+        END
+    ELSE returning false;
+    END IF;
+END $$;
 
 CREATE OR REPLACE FUNCTION Book_UpdateStock(int,int)
 returns setof Book
@@ -200,7 +215,7 @@ $$
     SELECT * FROM UserBookSelections WHERE isbn = $1
 $$;
 
-CREATE OR REPLACE FUNCTION Book_GetRemoveable()
+CREATE OR REPLACE FUNCTION Book_GetRemovable()
 returns setof Book
 language 'sql'
 AS 

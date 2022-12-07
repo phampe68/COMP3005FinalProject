@@ -36,7 +36,7 @@ CREATE TABLE Author(
 );
 
 CREATE TABLE UserCards(
-    userID SERIAL,
+    userID int,
     cardHolderName VARCHAR (255),
     cardNumber VARCHAR (255),
     expiryDate timestamp,
@@ -52,7 +52,7 @@ CREATE TABLE Book(
     price numeric(6,2),
     commission numeric(3,2),
     stock INT,
-    publisherID SERIAL,
+    publisherID int,
     PRIMARY KEY (isbn),
     FOREIGN KEY (publisherID) references Publisher (publisherID)
 );
@@ -64,27 +64,27 @@ CREATE TABLE StoreOrder(
     deliveryStatus BOOLEAN,
     locationInTransit VARCHAR (255),
     dtime timestamp,
-    userID SERIAL,
+    userID int,
     PRIMARY KEY (orderNumber),
     FOREIGN KEY (userID) references StoreUser (userID)
 );
 
 CREATE TABLE BookAuthors(
-    authorID SERIAL,
-    isbn SERIAL,
+    authorID int,
+    isbn int,
     FOREIGN KEY (authorID) references Author (authorID),
     FOREIGN KEY (isbn) references Book (isbn)
 );
 
 CREATE TABLE BookGenres(
     genre varchar(255),
-    isbn SERIAL,
+    isbn int,
     FOREIGN KEY (isbn) references Book (isbn)
 );
 
 CREATE TABLE BookOrders(
-    orderNumber SERIAL,
-    isbn SERIAL,
+    orderNumber int,
+    isbn int,
     quantity int,
     FOREIGN KEY (orderNumber) references StoreOrder (orderNumber),
     FOREIGN KEY (isbn) references Book (isbn)
@@ -92,8 +92,8 @@ CREATE TABLE BookOrders(
 
 
 CREATE TABLE UserBookSelections(
-    userID SERIAL,
-    isbn SERIAL,
+    userID int,
+    isbn int,
     quantity int,
     FOREIGN KEY (userID) references StoreUser (userID),
     FOREIGN KEY (isbn) references Book (isbn)

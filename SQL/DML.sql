@@ -1,20 +1,30 @@
-DELETE FROM STOREUSER;
 DELETE FROM USERCARDS;
-DELETE FROM AUTHOR;
-DELETE FROM PUBLISHER;
-DELETE FROM BOOK;
 DELETE FROM BOOKAUTHORS;
+
+
+DELETE FROM BOOKORDERS;
 DELETE FROM BOOKGENRES;
+DELETE FROM AUTHOR;
+
+DELETE FROM BOOK;
+DELETE FROM PUBLISHER;
 DELETE FROM USERBOOKSELECTIONS;
 DELETE FROM STOREORDER;
-DELETE FROM BOOKORDERS;
+DELETE FROM STOREUSER;
+
+ALTER SEQUENCE author_authorid_seq MINVALUE 1;
+ALTER SEQUENCE book_isbn_seq MINVALUE 1;
+ALTER SEQUENCE publisher_publisherid_seq MINVALUE 1;
+ALTER SEQUENCE storeorder_ordernumber_seq MINVALUE 1;
+ALTER SEQUENCE storeuser_userid_seq MINVALUE 1;
+
 
 --storeuser
 INSERT INTO STOREUSER (fName,lName,address,email,phoneNumber) values ('Test','User 1','123 Example Street','user1@gmail.com','(123)-456-7890'), 
 ('Test','User 2','124 Example Street','user2@gmail.com','(123)-456-7891');
 
 --usercard
-INSERT INTO UserCards (cardHolderName,cardNumber,expiryDate,securityCode) values ('Test User 1',1234567890,'2024-11-10',123);
+INSERT INTO UserCards (userID,cardHolderName,cardNumber,expiryDate,securityCode) values (1,'Test User 1',1234567890,'2024-11-10',123);
 
 --author
 INSERT INTO AUTHOR (fName,lName) values ('Jolkien Rolkien Rolkien','Tolkien');

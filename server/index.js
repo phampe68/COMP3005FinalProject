@@ -130,7 +130,7 @@ app.put('/books/:id', async(req,res)=>{
         console.log(req.params);
         const {id}=req.params;
         const {stock}=req.body;
-        const book = await pool.query("SELECT * FROM Book_UdateStock($1,$2)",[id,stock]);
+        const book = await pool.query("SELECT * FROM Book_UpdateStock($1,$2)",[id,stock]);
         res.json(book.rows);
     } catch (err) {
         console.error(err.message);
@@ -174,6 +174,17 @@ app.post('/authors/', async(req,res)=>{
         console.log(req.body);
         const {fName,lName}=req.body;
         const author = await pool.query("SELECT * FROM Author_Register($1,$2)",[fName,lName]);
+        res.json(author.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+);
+
+//get an author
+app.get('/authors/', async(req,res)=>{
+    try {
+        const author = await pool.query("SELECT * FROM Author");
         res.json(author.rows);
     } catch (err) {
         console.error(err.message);
@@ -327,9 +338,9 @@ app.delete('/bookorders/:id', async(req,res)=>{
 );
 
 //find books that can be removed (they are not part of an order, or in a user's selection)
-app.get('/books/removeable', async(req,res)=>{
+app.get('/books/removable', async(req,res)=>{
     try {
-        const removeable = await pool.query("SELECT * FROM Book_GetRemoveable()");
+        const removeable = await pool.query("SELECT * FROM Book_GetRemovable()");
         res.json(removeable.rows);
     } catch (err) {
         console.error(err.message);
@@ -337,7 +348,7 @@ app.get('/books/removeable', async(req,res)=>{
 }
 );
 
-app.get('/reports/', async(req,res)=>{
+app.get('/reports/allOrders', async(req,res)=>{
 
 }
 );
