@@ -1,10 +1,18 @@
 DROP TABLE IF EXISTS Publisher CASCADE;
 DROP TABLE IF EXISTS StoreUser CASCADE;
+DROP TABLE IF EXISTS UserCards CASCADE;
 DROP TABLE IF EXISTS Author CASCADE;
 DROP TABLE IF EXISTS Book CASCADE;
 DROP TABLE IF EXISTS BookAuthors CASCADE;
 DROP TABLE IF EXISTS BookOrders CASCADE;
 DROP TABLE IF EXISTS UserBookSelections CASCADE;
+DROP TABLE IF EXISTS StoreOrder CASCADE;
+DROP TABLE IF EXISTS BookGenres CASCADE;
+DROP IF EXISTS SEQUENCE author_authorid_seq MINVALUE 1;
+DROP IF EXISTS SEQUENCE book_isbn_seq MINVALUE 1;
+DROP IF EXISTS SEQUENCE publisher_publisherid_seq MINVALUE 1;
+DROP IF EXISTS SEQUENCE storeorder_ordernumber_seq MINVALUE 1;
+DROP IF EXISTS SEQUENCE storeuser_userid_seq MINVALUE 1;
 
 CREATE TABLE Publisher(
     publisherID SERIAL,
@@ -33,10 +41,10 @@ CREATE TABLE Author(
 );
 
 CREATE TABLE UserCards(
-    userID SERIAL,
+    userID int,
     cardHolderName VARCHAR (255),
     cardNumber VARCHAR (255),
-    expiryDate VARCHAR (255),
+    expiryDate timestamp,
     securityCode INT,
     PRIMARY KEY (cardNumber),
     FOREIGN KEY (userID) references StoreUser (userID)
@@ -49,7 +57,7 @@ CREATE TABLE Book(
     price numeric(6,2),
     commission numeric(3,2),
     stock INT,
-    publisherID SERIAL,
+    publisherID int,
     PRIMARY KEY (isbn),
     FOREIGN KEY (publisherID) references Publisher (publisherID)
 );
@@ -61,27 +69,27 @@ CREATE TABLE StoreOrder(
     deliveryStatus BOOLEAN,
     locationInTransit VARCHAR (255),
     dtime timestamp,
-    userID SERIAL,
+    userID int,
     PRIMARY KEY (orderNumber),
     FOREIGN KEY (userID) references StoreUser (userID)
 );
 
 CREATE TABLE BookAuthors(
-    authorID SERIAL,
-    isbn SERIAL,
+    authorID int,
+    isbn int,
     FOREIGN KEY (authorID) references Author (authorID),
     FOREIGN KEY (isbn) references Book (isbn)
 );
 
 CREATE TABLE BookGenres(
     genre varchar(255),
-    isbn SERIAL,
+    isbn int,
     FOREIGN KEY (isbn) references Book (isbn)
 );
 
 CREATE TABLE BookOrders(
-    orderNumber SERIAL,
-    isbn SERIAL,
+    orderNumber int,
+    isbn int,
     quantity int,
     FOREIGN KEY (orderNumber) references StoreOrder (orderNumber),
     FOREIGN KEY (isbn) references Book (isbn)
@@ -89,8 +97,8 @@ CREATE TABLE BookOrders(
 
 
 CREATE TABLE UserBookSelections(
-    userID SERIAL,
-    isbn SERIAL,
+    userID int,
+    isbn int,
     quantity int,
     FOREIGN KEY (userID) references StoreUser (userID),
     FOREIGN KEY (isbn) references Book (isbn)
