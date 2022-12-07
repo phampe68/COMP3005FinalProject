@@ -22,20 +22,15 @@ const CartCard = (props) => {
 
     const removeFromCart = (e) => {
 
-        /*
-        axios.delete('http://localhost:5000/selections', {
-            userID: user,
-            isbn: props.book.isbn,
-            quantity: quantity,
-        })
+        
+        axios.delete('http://localhost:5000/selections/' + localStorage.getItem("user") + "/" + props.book.isbn)
             .then(function (response) {
-                setQuantity(0);
                 console.log(response);
             })
             .catch(function (error) {
                 console.log(error);
             });
-            */
+            
     }
 
     return (

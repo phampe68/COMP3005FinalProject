@@ -11,35 +11,53 @@ import axios from 'axios';
 function ModeSelect() {
     let navigate = useNavigate();
 
-    const [usersList, setUserList] = useState([{ id: 1 }]);
+    const [usersList, setUserList] = useState([]);
+    const [currUser, setCurrUser] = useState();
 
     useEffect(() => {
         axios.get(`http://localhost:5000/users/`).then(res => {
             setUserList(res.data);
         });
-    }, []); 
+    }, []);
 
 
 
-    const [currUser, setCurrUser] = useState("");
-
-
-
-
-    const [currUserAdd, setCurrUserAdd] = useState("");
+    const [fName, setFName] = useState("");
+    const [lName, setLName] = useState("");
+    const [address, setAddress] = useState("");
+    const [email, setEmail] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
 
     const addUser = () => {
-        if (currUserAdd === "") {
-            alert("Add User field is empty");
+
+
+        if (fName === "" || lName === "" || email === "" || phoneNumber === "") {
+            alert("Missing Fields");
             return;
-        } else if (usersList.includes(currUserAdd)) {
+        } else if (usersList.filter(x => x.email == email).length > 0) {
             alert("User already exists")
             return;
         }
 
-        // TODO: register user endpoint on currUserAdd
-        alert("userAdded: " + currUserAdd);
-        navigate("/userHome");
+
+        axios.post('http://localhost:5000/users', {
+            fName: fName,
+            lName: lName,
+            address: address,
+            email: email,
+            phoneNumber, phoneNumber
+        })
+            .then(function (response) {
+                setFName("");
+                setLName("");
+                setEmail("");
+                setPhoneNumber("");
+                navigate("/userHome");
+
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     }
 
     const goToUserHome = () => {
@@ -49,9 +67,6 @@ function ModeSelect() {
         }
 
         alert("go to user: " + currUser);
-
-        //TODO: set current user (cookie? db?)
-
         localStorage.setItem('user', currUser)
         navigate("/userHome");
     }
@@ -87,9 +102,20 @@ function ModeSelect() {
                 <h2>Can't see your user? Add a user here! (no password needed) </h2>
 
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-
-                    <TextField id="txtAddUser" label="Enter Your Username" variant="outlined" width sx={{ width: 300, marginRight: 2 }}
-                        onChange={(e) => setCurrUserAdd(e.target.value)}
+                    <TextField id="txtAddUser" label="First Name" variant="outlined" width sx={{ width: 300, marginRight: 2 }}
+                        onChange={(e) => setFName(e.target.value)}
+                    />
+                    <TextField id="txtAddUser" label="Last Name" variant="outlined" width sx={{ width: 300, marginRight: 2 }}
+                        onChange={(e) => setLName(e.target.value)}
+                    />
+                    <TextField id="txtAddUser" label="Address" variant="outlined" width sx={{ width: 300, marginRight: 2 }}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                    />
+                    <TextField id="txtAddUser" label="Email Address" variant="outlined" width sx={{ width: 300, marginRight: 2 }}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <TextField id="txtAddUser" label="Phone Number" variant="outlined" width sx={{ width: 300, marginRight: 2 }}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
                     />
 
                     <Button variant="contained" onClick={addUser}>Add User</Button>
