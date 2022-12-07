@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import OrderCard from '../components/orderCard';
 import axios from 'axios';
 import ButtonGroup from '@mui/material/ButtonGroup';
-
+import CartCard from "../components/cartCard";
 
 const myOrders = [
     {
@@ -47,21 +47,6 @@ const myOrders = [
 ];
 
 
-let order =
-{
-    userID: 2,
-    order: [
-        {
-            isbn: 13213213,
-            quantity: 2,
-        },
-        {
-            isbn: 13213213,
-            quantity: 2,
-        }
-    ]
-};
-
 /*
 Page that lets you search books and shows a bunch of books 
 */
@@ -73,7 +58,15 @@ function UserHome() {
         });
 
 
+
         setUser(localStorage.getItem("user"));
+
+        console.log(user);
+        axios.get(`http://localhost:5000/selections/` + user).then(res => {
+            console.log(res.data);
+            setCart(res.data);
+        });
+
     }, []);
 
 
@@ -86,6 +79,7 @@ function UserHome() {
     const [currGenre, setCurrGenre] = useState("");
     const [genres, setGenres] = useState([]);
     const [booksFound, setBooksFound] = useState([]);
+    const [cart, setCart] = useState([]);
 
     const addGenre = (e) => {
         if (!currGenre || genres.includes(currGenre)) return;
@@ -129,14 +123,20 @@ function UserHome() {
                 .then(function (response) {
                     setQuantity(0);
                     console.log(response);
+
+                    // update the cart
+                    axios.get(`http://localhost:5000/selections/` + user).then(res => {
+                        setCart(res.data);
+                    });
+
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
         }
-        
+
         return (
-            <Card sx={{ minWidth: 275, borderColor: "primary.main"}}>
+            <Card sx={{ minWidth: 275, borderColor: "primary.main" }}>
                 <CardContent>
                     <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                         {"ISBN: " + props.book.isbn}
@@ -231,7 +231,6 @@ function UserHome() {
                 <Grid style={{ marginTop: "5px", width: "50%" }} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
                     {myOrders.map((order, index) => (
                         <Grid item xs={2} sm={4} md={4} key={index}>
-
                             <OrderCard order={order} />
                         </Grid>
                     ))}
@@ -241,17 +240,31 @@ function UserHome() {
 
             </div>
 
-            <Grid style={{ marginTop: "5px", width: "100%", paddingBottom: "2%", alignItems: "center" }} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-                {booksFound.map((book, index) => (
+            <div>
+                <h2> Books: </h2>
+                <Grid style={{ marginTop: "5px", width: "100%", paddingBottom: "2%", alignItems: "center" }} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+                    {booksFound.map((book, index) => (
 
-                    <Grid item xs={2} sm={4} md={4} key={index}>
-                        <BookCard book={book} index={index} />
-                    </Grid>
-                ))}
-            </Grid>
-
+                        <Grid item xs={2} sm={4} md={4} key={index}>
+                            <BookCard book={book} index={index} />
+                        </Grid>
+                    ))}
+                </Grid>
+            </div>
             <div style={{ display: "flex", alignItems: "center" }}>
                 <Button onClick={() => { navigate('/checkout'); }} variant="outlined" style={{ minHeight: '80px' }}> Checkout </Button>
+            </div>
+
+            <div>
+                <h2>Cart</h2>
+                <Grid style={{ marginTop: "5px", width: "100%", paddingBottom: "2%", alignItems: "center" }} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+                    {cart.map((book, index) => (
+
+                        <Grid item xs={2} sm={4} md={4} key={index}>
+                            <CartCard book={book} index={index} />
+                        </Grid>
+                    ))}
+                </Grid>
             </div>
         </div>
     )

@@ -265,10 +265,9 @@ app.post('/selections/', async(req,res)=>{
 );
 
 //get book selections
-app.get('/selections/id', async(req,res)=>{
+app.get('/selections/:id', async(req,res)=>{
     try {
-        //console.log(req.body);
-        const {userID}=req.params;
+        const userID =req.params.id;
         console.log(userID);
         const selection = await pool.query("SELECT * FROM UserBookSelections_GetById($1)",[userID]);
         res.json(selection.rows);
