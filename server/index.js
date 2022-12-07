@@ -268,10 +268,10 @@ app.post('/selections/', async(req,res)=>{
 app.get('/selections/:id', async(req,res)=>{
     try {
         console.log(req.body);
-        const {userID}=req.params;
+        const userID= req.params.id;
         console.log(userID);
         
-        const selection = await pool.query("SELECT * FROM UserBookSelections_GetById($1)",userID);
+        const selection = await pool.query("SELECT * FROM UserBookSelections_GetById($1)",[userID]);
         let books;
         for (let i=0;i<selection.length;i++){
             books[i] = await pool.query("SELECT * FROM Book_GetById($1)",[selection.row[i].isbn]);
