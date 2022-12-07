@@ -75,10 +75,10 @@ app.post('/books', async(req,res)=>{
         
         for(let i=0;i<genres.length;i++){
             console.log(newBook.rows[0].isbn,genres[i]);
-            newBookGenre[i] = await pool.query("SELECT * FROM BookGenres_Register($1,$2)",[Number(newBook.rows[0].isbn),String(genres[i])]);
+            newBookGenre[i] = await pool.query("SELECT * FROM BookGenres_AddGenre($1::int,'$2'::varchar)",[Number(newBook.rows[0].isbn),String(genres[i])]);
         }
         for(let i=0;i<authors.length;i++){
-            newBookAuthor = await pool.query("SELECT * FROM BookAuthors_Register($1,$2)",[newBook.rows[0].isbn,authors[i]]);
+            newBookAuthor = await pool.query("SELECT * FROM BookAuthors_AddAuthor($1,$2)",[newBook.rows[0].isbn,authors[i]]);
         }
         console.log(newBook.rows);
         console.log(newBookAuthor.rows);
@@ -265,12 +265,18 @@ app.post('/selections/', async(req,res)=>{
 );
 
 //get book selections
-app.get('/selections/id', async(req,res)=>{
+app.get('/selections/:id', async(req,res)=>{
     try {
-        //console.log(req.body);
+        console.log(req.body);
         const {userID}=req.params;
         console.log(userID);
-        const selection = await pool.query("SELECT * FROM UserBookSelections_GetById($1)",[userID]);
+        
+        const selection = await pool.query("SELECT * FROM UserBookSelections_GetById($1)",userID);
+        let books;
+        for (let i=0;i<selection.length;i++){
+            books[i] = await pool.query("SELECT * FROM Book_GetById($1)",[selection.row[i].isbn]);
+        }
+
         res.json(selection.rows);
     } catch (err) {
         console.error(err.message);
@@ -282,8 +288,21 @@ app.get('/selections/id', async(req,res)=>{
 app.delete('/selections/:id/:isbn', async(req,res)=>{
     try {
         console.log(req.params);
+        const {userID,isbn}=req.body;
+        const selection = await pool.query("SELECT * FROM UserBookSelections_Delete($1,$2)",[userID,isbn]);
+        res.json(selection.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+);
+
+//delete book selections
+app.put('/selections/:id/:isbn', async(req,res)=>{
+    try {
+        console.log(req.params);
         const {userID,isbn}=req.params;
-        const selection = await pool.query("SELECT * FROM UserBookSelections_Delete($1)",[userID,isbn]);
+        const selection = await pool.query("SELECT * FROM UserBookSelections_Delete($1,$2)",[userID,isbn]);
         res.json(selection.rows);
     } catch (err) {
         console.error(err.message);

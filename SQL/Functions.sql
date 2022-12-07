@@ -130,7 +130,7 @@ $$
     UPDATE Book SET stock=$2 where isbn=$1 RETURNING *;
 $$;
 
-CREATE OR REPLACE FUNCTION BookAuthors_Register(int,int)
+CREATE OR REPLACE FUNCTION BookAuthors_AddAuthor(int,int)
 returns setof BookAuthors
 language 'sql'
 AS
@@ -217,6 +217,22 @@ language 'sql'
 AS
 $$
     INSERT INTO UserBookSelections (userID, ISBN, quantity) VALUES ($1,$2,$3) RETURNING *;
+$$;
+
+CREATE OR REPLACE FUNCTION UserBookSelections_AddQuantity(int,int,int)
+returns setof UserBookSelections
+language 'sql'
+AS
+$$
+    Update UserBookSelections set quantity=quantity+$3 where userID=$1 and isbn=$2 RETURNING *;
+$$;
+
+CREATE OR REPLACE FUNCTION UserBookSelections_SubQuantity(int,int,int)
+returns setof UserBookSelections
+language 'sql'
+AS
+$$
+    Update UserBookSelections set quantity=quantity-$3 where userID=$1 and isbn=$2 RETURNING *;
 $$;
 
 CREATE OR REPLACE FUNCTION UserBookSelections_Delete(int)
