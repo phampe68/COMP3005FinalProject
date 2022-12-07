@@ -110,14 +110,17 @@ language 'sql'
 AS
 $$
 BEGIN
-    IF ($1 is in (select isbn from Book_GetRemovable())) THEN
-        BEGIN
-        DELETE FROM BookAuthors where isbn=$1;
-        DELETE FROM Book b where b.isbn=$1 RETURNING True;
-        END
-    ELSE returning false;
-    END IF;
-END $$;
+    SELECT ISBN FROM Book_GetRemovable()
+    where isbn=$1;
+    if found then
+        delete from BookAuthors where isbn=$1;
+        delete from BookGenres where isbn=$1;
+        delete from book where isbn=$1;
+        Return true;
+    end if;
+    return false; 
+END; $$;
+
 
 CREATE OR REPLACE FUNCTION Book_UpdateStock(int,int)
 returns setof Book
@@ -158,6 +161,31 @@ AS
 $$
     INSERT INTO BookGenres (isbn, genre) VALUES ($1,$2) RETURNING *;
 $$;
+
+CREATE OR REPLACE FUNCTION StoreOrder_Register(varchar,varchar,boolean,varchar,timestamp,int)
+returns setof StoreOrder
+language 'sql'
+AS
+$$
+    INSERT INTO StoreOrder (shippingaddress,courier,deliverystatus,locationintransit,dtime,userid) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;
+$$;
+
+CREATE OR REPLACE FUNCTION StoreOrder_GetByID(int)
+returns setof StoreOrder
+language 'sql'
+AS 
+$$
+    SELECT * FROM StoreOrder WHERE orderNumber = $1
+$$;
+
+CREATE OR REPLACE FUNCTION StoreOrder_GetByUser(int)
+returns setof StoreOrder
+language 'sql'
+AS 
+$$
+    SELECT * FROM StoreOrder WHERE userID = $1
+$$;
+
 
 CREATE OR REPLACE FUNCTION BookOrders_Register(int,int,int)
 returns setof BookOrders

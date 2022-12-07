@@ -72,11 +72,13 @@ app.post('/books', async(req,res)=>{
         const newBook = await pool.query("SELECT * FROM Book_Register($1,$2,$3,$4,$5,$6)",[name, numberOfPages, price, commission, stock, publisherID]);
         let newBookGenre;
         let newBookAuthor;
+        
         for(let i=0;i<genres.length;i++){
-            newBookGenre[i] = await pool.query("SELECT * FROM BookGenres_Register($1,$2)",[newBook.isbn,genres[i]]);
+            console.log(newBook.rows[0].isbn,genres[i]);
+            newBookGenre[i] = await pool.query("SELECT * FROM BookGenres_Register($1,$2)",[Number(newBook.rows[0].isbn),String(genres[i])]);
         }
         for(let i=0;i<authors.length;i++){
-            newBookAuthor = await pool.query("SELECT * FROM BookAuthors_Register($1,$2)",[newBook.isbn,authors[i]]);
+            newBookAuthor = await pool.query("SELECT * FROM BookAuthors_Register($1,$2)",[newBook.rows[0].isbn,authors[i]]);
         }
         console.log(newBook.rows);
         console.log(newBookAuthor.rows);
@@ -85,6 +87,8 @@ app.post('/books', async(req,res)=>{
     } catch (err) {
         console.error(err.message);
     }
+
+
 }
 );
 
@@ -104,6 +108,7 @@ app.get('/books/:id', async(req,res)=>{
         console.log(req.params);
         const {id}=req.params;
         const book = await pool.query("SELECT * FROM Book_GetByID($1)",[id]);
+
         res.json(book.rows);
     } catch (err) {
         console.error(err.message);
@@ -263,7 +268,7 @@ app.post('/selections/', async(req,res)=>{
 app.post('/selections/', async(req,res)=>{
     try {
         console.log(req.body);
-        const {userid,bookid,quantity}=req.body;
+        const {userid,isbn,quantity}=req.body;
         const selection = await pool.query("SELECT * FROM UserBookSelections_AddBook($1,$2,$3)",[userid,isbn,quantity]);
         res.json(selection.rows);
     } catch (err) {
@@ -286,7 +291,7 @@ app.delete('/selections/:id/:isbn', async(req,res)=>{
 );
 
 //create order
-app.post('/orders/', async(req,res)=>{
+app.post('/storeorders/', async(req,res)=>{
     try {
         console.log(req.body);
         const {}=req.body;
@@ -298,8 +303,45 @@ app.post('/orders/', async(req,res)=>{
 }
 );
 
+//get storeorders
+app.get('/storeorders/', async(req,res)=>{
+    try {
+        const removeable = await pool.query("SELECT * FROM storeorder_GetALL()");
+        res.json(removeable.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+);
+
+//get an order by user id
+app.get('/storeorders/user/:id', async(req,res)=>{
+    try {
+        console.log(req.params);
+        const {id}=req.params;
+        const user = await pool.query("SELECT * FROM storeorder_GetByUser($1)",[id]);
+        res.json(user.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+);
+
+//get an order by order number
+app.get('/storeorders/:id', async(req,res)=>{
+    try {
+        console.log(req.params);
+        const {id}=req.params;
+        const user = await pool.query("SELECT * FROM storeorder_GetByID($1)",[id]);
+        res.json(user.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+);
+
 //delete order
-app.delete('/orders/:id', async(req,res)=>{
+app.delete('/storeorders/:id', async(req,res)=>{
     try {
         console.log(req.params);
         const {orderID}=req.params;
@@ -348,7 +390,7 @@ app.get('/books/removable', async(req,res)=>{
 }
 );
 
-app.get('/reports/allOrders', async(req,res)=>{
+app.get('/reports/sales', async(req,res)=>{
 
 }
 );

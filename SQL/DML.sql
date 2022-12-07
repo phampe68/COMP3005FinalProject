@@ -9,6 +9,12 @@ DELETE FROM USERBOOKSELECTIONS;
 DELETE FROM STOREORDER;
 DELETE FROM STOREUSER;
 
+ALTER SEQUENCE author_authorid_seq START 10000;
+ALTER SEQUENCE book_isbn_seq START 10000;
+ALTER SEQUENCE publisher_publisherid_seq START 10000;
+ALTER SEQUENCE storeorder_ordernumber_seq START 10000;
+ALTER SEQUENCE storeuser_userid_seq START 10000;
+
 --storeuser
 INSERT INTO STOREUSER (userID,fName,lName,address,email,phoneNumber) values (1,'Test','User 1','123 Example Street','user1@gmail.com','(123)-456-7890'), 
 (2,'Test','User 2','124 Example Street','user2@gmail.com','(123)-456-7891');
