@@ -47,11 +47,12 @@ function ModeSelect() {
             alert("No user selected.");
             return;
         }
+
         alert("go to user: " + currUser);
+
         //TODO: set current user (cookie? db?)
 
         localStorage.setItem('user', currUser)
-
         navigate("/userHome");
     }
 
