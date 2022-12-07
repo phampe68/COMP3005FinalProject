@@ -18,15 +18,17 @@ const myOrders = [
 Page that shows a bunch of books 
 */
 function BookOrderCard(props) {
+    const [quantity, setQuantity] = useState();
+    
     return (
         <div>
             <Card sx={{ minWidth: 275, borderColor: "primary.main" }}>
                 <CardContent>
                     <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                        {"ISBN : " + props.order.orderNumber}
+                        {"ISBN : " + props.book.ISBN}
                     </Typography>
                     <Typography variant="h5" component="div">
-                        {props.order.shippingAddress}
+                        {props.book.title}
                     </Typography>
                     <Typography variant="body" component="div">
                         {props.order.courier}

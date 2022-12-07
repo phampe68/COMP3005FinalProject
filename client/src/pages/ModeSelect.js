@@ -1,38 +1,31 @@
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 function ModeSelect() {
     let navigate = useNavigate();
 
-    // TODO: get usersList from backend
-    let usersList = ['root',
-        'test',
-        'guest',
-        'info',
-        'adm',
-        'mysql',
-        'user',
-        'administrator',
-        'oracle',
-        'ftp',
-        'pi',
-        'puppet',
-        'ansible',
-        'ec2-user',
-        'vagrant',
-        'azureuser'];
+    const [usersList, setUserList] = useState([{ id: 1 }]);
+
+    useEffect(() => {
+        axios.get(`http://localhost:5000/users/`).then(res => {
+            setUserList(res.data);
+        });
+    }, []); 
+
+
 
     const [currUser, setCurrUser] = useState("");
-    
-    
-    
-    
+
+
+
+
     const [currUserAdd, setCurrUserAdd] = useState("");
 
     const addUser = () => {
@@ -43,20 +36,20 @@ function ModeSelect() {
             alert("User already exists")
             return;
         }
-        
+
         // TODO: register user endpoint on currUserAdd
         alert("userAdded: " + currUserAdd);
         navigate("/userHome");
     }
 
     const goToUserHome = () => {
-        if (!currUser ) {
+        if (!currUser) {
             alert("No user selected.");
             return;
         }
-        alert ("go to user: " + currUser);
+        alert("go to user: " + currUser);
         //TODO: set current user (cookie? db?)
-        
+
         localStorage.setItem('user', currUser)
 
         navigate("/userHome");
@@ -79,7 +72,7 @@ function ModeSelect() {
                     <Autocomplete
                         disablePortal
                         id="combo-box-demo"
-                        options={usersList}
+                        options={usersList.map(x => x.userid + '')}
                         sx={{ width: 300, marginRight: 2 }}
                         renderInput={(params) => <TextField {...params} label="User Select"
 

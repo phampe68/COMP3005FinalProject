@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState , useEffect} from 'react';
 
 import { Button, TextField } from '@mui/material';
 import Radio from '@mui/material/Radio';
@@ -87,8 +87,17 @@ const myOrders = [
 Page that lets you search books and shows a bunch of books 
 */
 function UserHome() {
-    let navigate = useNavigate();
+    
+    useEffect(() => {
+        const loggedInUser = localStorage.getItem("user");
+        setUser(loggedInUser);
+        alert(loggedInUser);
+      }, []);
+      
 
+    let navigate = useNavigate();
+    
+    const [user, setUser] = useState("");
     const [searchField, setSearchField] = useState("");
     const [searchBy, setSearchBy] = useState(""); //which field to saerch by (ISBN, name, author name, publisher)
 
