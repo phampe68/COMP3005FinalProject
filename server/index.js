@@ -52,7 +52,9 @@ async function parseJSON(j){
             const author = await pool.query("SELECT * FROM Author_GetByID($1)",[j[i].authorid]);
             j[i].author = author.rows[0]
         }
-        if((typeof j[i].isbn !=="undefined")&&(j[i].name=="undefined")){
+        console.log(j[i].isbn)
+        console.log(j[i].name)
+        if((typeof j[i].isbn !=="undefined")&&(typeof j[i].name=="undefined")){
             const book = await pool.query("SELECT * FROM Book_GetByID($1)",[j[i].isbn]);
             j[i].book = book.rows[0]
         }
@@ -64,6 +66,7 @@ async function parseJSON(j){
             const order = await pool.query("SELECT * FROM StoreOrder_GetByID($1)",[j[i].orderid]);
             j[i].order = order.rows[0]
         }
+        console.log(j[i])
         
     }
     //console.log("j:",j)
