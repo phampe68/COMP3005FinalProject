@@ -44,11 +44,11 @@ async function parseJSON(j){
     
     for (let i in j){
         console.log("ji: ",j[i])
-        if(typeof j[i].userid !=="undefined"){
+        if((typeof j[i].userid !=="undefined")&&(typeof j[i].fname=="undefined")){
             const user = await pool.query("SELECT * FROM StoreUser_GetByID($1)",[j[i].userid]);
             j[i].user = user.rows[0]
         }
-        if(typeof j[i].authorid !=="undefined"){
+        if((typeof j[i].authorid !=="undefined")&&(typeof j[i].fname=="undefined")){
             const author = await pool.query("SELECT * FROM Author_GetByID($1)",[j[i].authorid]);
             j[i].author = author.rows[0]
         }
@@ -69,7 +69,7 @@ async function parseJSON(j){
         console.log(j[i])
         
     }
-    //console.log("j:",j)
+    console.log("j:",j)
     return j;
     
 }
@@ -101,8 +101,7 @@ app.post('/users', async(req,res)=>{
 //get all users
 app.get("/users", async (req, res) => {
     try {
-        const allUsers = await pool.query("SELECT * FROM STOREUSER_GetALL()");
-        
+        const allUsers = await pool.query("SELECT * FROM STOREUSER_GetALL()");        
         res.json(allUsers.rows);
     } catch (err) {
         console.error(err.message);
@@ -115,7 +114,8 @@ app.get('/users/:id', async(req,res)=>{
         console.log(req.params);
         const {id}=req.params;
         const user = await pool.query("SELECT * FROM StoreUser_GetByID($1)",[id]);
-        res.json(parseJson(user.rows));
+        output = parseJSON(user.rows)
+        res.json(output);
     } catch (err) {
         console.error(err.message);
     }
@@ -128,7 +128,8 @@ app.delete('/users/:id', async(req,res)=>{
         console.log(req.params);
         const {id}=req.params;
         const user = await pool.query("SELECT * FROM StoreUser_Delete($1)",[id]);
-        res.json(parseJson(user.rows));
+        output = await parseJSON(user.rows)
+        res.json(output);
     } catch (err) {
         console.error(err.message);
     }
