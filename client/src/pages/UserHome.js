@@ -67,8 +67,6 @@ function UserHome() {
             setBooksFound(res.data);
         });
 
-
-
         setUser(localStorage.getItem("user"));
 
         axios.get(`http://localhost:5000/selections/` + user).then(res => {
@@ -103,14 +101,12 @@ function UserHome() {
         alert("executing search for: " + query);
     }
 
-
     const BookCard = (props) => {
         const [quantity, setQuantity] = useState(0);
 
         let book = props.book.book[0];
         let author = props.book.authors[0];
         let genres = props.book.genres.map(x=>x.genre);
-        console.log("HERE: ", genres);
         const handleIncrement = (ISBN) => {
             setQuantity(quantity + 1);
         }
