@@ -162,12 +162,36 @@ $$
     INSERT INTO BookGenres (isbn, genre) VALUES ($1,$2) RETURNING *;
 $$;
 
+CREATE OR REPLACE FUNCTION BookGenres_GetByBook(int)
+returns setof BookGenres
+language 'sql'
+AS 
+$$
+    SELECT * FROM BookGenres WHERE ISBN = $1
+$$;
+
+CREATE OR REPLACE FUNCTION BookGenres_GetByGenre(varchar)
+returns setof BookGenres
+language 'sql'
+AS 
+$$
+    SELECT * FROM BookGenres WHERE GENRE = $1
+$$;
+
 CREATE OR REPLACE FUNCTION StoreOrder_Register(varchar,varchar,boolean,varchar,timestamp,int)
 returns setof StoreOrder
 language 'sql'
 AS
 $$
     INSERT INTO StoreOrder (shippingaddress,courier,deliverystatus,locationintransit,dtime,userid) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;
+$$;
+
+CREATE OR REPLACE FUNCTION StoreOrder_GetAll()
+returns setof StoreOrder
+language 'sql'
+AS 
+$$
+    SELECT * FROM StoreOrder
 $$;
 
 CREATE OR REPLACE FUNCTION StoreOrder_GetByID(int)
@@ -203,12 +227,28 @@ $$
     DELETE FROM BookOrders where orderNumber=$1 RETURNING *;
 $$;
 
-CREATE OR REPLACE FUNCTION BookOrders_GetByID(int)
+CREATE OR REPLACE FUNCTION BookOrders_GetAll()
+returns setof BookOrders
+language 'sql'
+AS 
+$$
+    SELECT * FROM BookOrders
+$$;
+
+CREATE OR REPLACE FUNCTION BookOrders_GetByBook(int)
 returns setof BookOrders
 language 'sql'
 AS 
 $$
     SELECT * FROM BookOrders WHERE isbn = $1
+$$;
+
+CREATE OR REPLACE FUNCTION BookOrders_GetByOrder(int)
+returns setof BookOrders
+language 'sql'
+AS 
+$$
+    SELECT * FROM BookOrders WHERE orderNumber = $1
 $$;
 
 CREATE OR REPLACE FUNCTION UserBookSelections_AddBook(int,int,int)
