@@ -51,6 +51,16 @@ const myOrders = [
 Page that lets you search books and shows a bunch of books 
 */
 function UserHome() {
+    let navigate = useNavigate();
+
+    const [user, setUser] = useState(localStorage.getItem("user"));
+    const [searchField, setSearchField] = useState("");
+    const [searchBy, setSearchBy] = useState(""); //which field to saerch by (ISBN, name, author name, publisher)
+    const [currGenre, setCurrGenre] = useState("");
+    const [genres, setGenres] = useState([]);
+    const [booksFound, setBooksFound] = useState([]);
+    const [cart, setCart] = useState([]);
+    const [totalPrice, setTotalPrice] = useState(0);
 
     useEffect(() => {
         axios.get(`http://localhost:5000/books/`).then(res => {
@@ -61,25 +71,19 @@ function UserHome() {
 
         setUser(localStorage.getItem("user"));
 
-        console.log(user);
         axios.get(`http://localhost:5000/selections/` + user).then(res => {
-            console.log(res.data);
+
             setCart(res.data);
+            let temp = 0;
+            for (let selection of res.data) {
+                temp += selection.quantity * selection.book.price;
+            }
+            setTotalPrice(temp);
         });
 
     }, []);
 
 
-    let navigate = useNavigate();
-
-    const [user, setUser] = useState(localStorage.getItem("user"));
-    const [searchField, setSearchField] = useState("");
-    const [searchBy, setSearchBy] = useState(""); //which field to saerch by (ISBN, name, author name, publisher)
-
-    const [currGenre, setCurrGenre] = useState("");
-    const [genres, setGenres] = useState([]);
-    const [booksFound, setBooksFound] = useState([]);
-    const [cart, setCart] = useState([]);
 
     const addGenre = (e) => {
         if (!currGenre || genres.includes(currGenre)) return;
@@ -103,31 +107,43 @@ function UserHome() {
     const BookCard = (props) => {
         const [quantity, setQuantity] = useState(0);
 
+        let book = props.book.book[0];
+        let author = props.book.authors[0];
+        let genres = props.book.genres.map(x=>x.genre);
+        console.log("HERE: ", genres);
         const handleIncrement = (ISBN) => {
             setQuantity(quantity + 1);
         }
 
         const handleDecrement = (ISBN) => {
-            setQuantity(quantity + 1);
+            setQuantity(quantity - 1);
 
         }
 
         const addToCart = (e) => {
             if (quantity === 0) return;
 
+
             axios.post('http://localhost:5000/selections', {
                 userID: user,
-                isbn: props.book.isbn,
+                isbn: book.isbn,
                 quantity: quantity,
             })
                 .then(function (response) {
                     setQuantity(0);
-                    console.log(response);
 
                     // update the cart
                     axios.get(`http://localhost:5000/selections/` + user).then(res => {
                         setCart(res.data);
                     });
+
+                    // update the total
+                    let temp = 0;
+
+                    for (let selection of cart) {
+                        temp += selection[0].quantity * selection[1].price;
+                    }
+                    setTotalPrice(temp);
 
                 })
                 .catch(function (error) {
@@ -135,30 +151,34 @@ function UserHome() {
                 });
         }
 
+
         return (
             <Card sx={{ minWidth: 275, borderColor: "primary.main" }}>
                 <CardContent>
                     <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                        {"ISBN: " + props.book.isbn}
+                        {"ISBN: " + book.isbn}
                     </Typography>
                     <Typography variant="h5" component="div">
-                        {props.book.name}
+                        {book.name}
                     </Typography>
                     <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                        {props.book.authorName + ", " + props.book.publisherName}
+                        {author.fname + ", " + author.lname + " - " + book.publisher.name}
+                    </Typography>
+                    <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                        {genres}
                     </Typography>
                     <Typography variant="body1" color="yellow">
 
-                        {"Price: $" + props.book.price}
+                        {"Price: $" + book.price}
                     </Typography>
                 </CardContent>
                 <CardActions>
                     <ButtonGroup size="small" aria-label="small outlined button group" >
-                        <Button onClick={() => { handleIncrement(props.book.ISBN) }}>+</Button>
+                        <Button onClick={() => { handleIncrement(book.isbn) }}>+</Button>
                         <Button>{
                             quantity
                         }</Button>
-                        <Button onClick={() => { handleDecrement(props.book.ISBN) }}>-</Button>
+                        <Button onClick={() => { handleDecrement(book.isbn) }}>-</Button>
                     </ButtonGroup>
                     <Button size="small" onClick={addToCart} variant="outlined" >
                         <Typography variant="body1" component="div">
@@ -251,21 +271,25 @@ function UserHome() {
                     ))}
                 </Grid>
             </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-                <Button onClick={() => { navigate('/checkout'); }} variant="outlined" style={{ minHeight: '80px' }}> Checkout </Button>
-            </div>
 
             <div>
                 <h2>Cart</h2>
                 <Grid style={{ marginTop: "5px", width: "100%", paddingBottom: "2%", alignItems: "center" }} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-                    {cart.map((book, index) => (
+                    {cart ? cart.map((selection, index) => (
 
                         <Grid item xs={2} sm={4} md={4} key={index}>
-                            <CartCard book={book} index={index} />
+                            <CartCard selection={selection} index={index} />
                         </Grid>
-                    ))}
+                    )) : null}
                 </Grid>
+                <h2>Total Price $:{totalPrice}</h2>
             </div>
+
+
+            <div style={{ display: "flex", alignItems: "center" }}>
+                <Button onClick={() => { navigate('/checkout'); }} variant="outlined" style={{ minHeight: '80px' }}> Checkout </Button>
+            </div>
+
         </div>
     )
 

@@ -16,3 +16,4 @@ server/node_modules/nopt/bin/nopt.js
 server/node_modules/nodemon/bin/nodemon.js
 server/node_modules/mime/src/build.js
 server/node_modules/mime/cli.js
+server/db.js

@@ -1,53 +1,43 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 
-import { Button, TextField } from '@mui/material';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
-import Grid from '@mui/material/Grid';
+import { Button } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import { useNavigate } from "react-router-dom";
-import OrderCard from '../components/orderCard';
 import axios from 'axios';
-import ButtonGroup from '@mui/material/ButtonGroup';
 
 
 const CartCard = (props) => {
-
+    let book = props.selection.book;
     const removeFromCart = (e) => {
-
-        
-        axios.delete('http://localhost:5000/selections/' + localStorage.getItem("user") + "/" + props.book.isbn)
+        axios.delete('http://localhost:5000/selections/' + localStorage.getItem("user") + "/" + book.isbn)
             .then(function (response) {
                 console.log(response);
             })
             .catch(function (error) {
                 console.log(error);
             });
-            
     }
+
 
     return (
         <Card sx={{ minWidth: 275, borderColor: "primary.main" }}>
             <CardContent>
                 <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    {"ISBN: " + props.book.isbn}
+                    {"ISBN: " + book.isbn}
                 </Typography>
                 <Typography variant="h5" component="div">
-                    {props.book.name}
+                    {book.name}
                 </Typography>
-                <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                    {props.book.authorName + ", " + props.book.publisherName}
+   
+                <Typography variant="body1" color="yellow">
+
+                    {"Quantity: " + props.selection.quantity}
                 </Typography>
                 <Typography variant="body1" color="yellow">
 
-                    {"Price: $" + props.book.price}
+                    {"Price: $" + book.price}
                 </Typography>
             </CardContent>
             <CardActions>
