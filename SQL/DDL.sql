@@ -8,11 +8,11 @@ DROP TABLE IF EXISTS BookOrders CASCADE;
 DROP TABLE IF EXISTS UserBookSelections CASCADE;
 DROP TABLE IF EXISTS StoreOrder CASCADE;
 DROP TABLE IF EXISTS BookGenres CASCADE;
-DROP IF EXISTS SEQUENCE author_authorid_seq MINVALUE 1;
-DROP IF EXISTS SEQUENCE book_isbn_seq MINVALUE 1;
-DROP IF EXISTS SEQUENCE publisher_publisherid_seq MINVALUE 1;
-DROP IF EXISTS SEQUENCE storeorder_ordernumber_seq MINVALUE 1;
-DROP IF EXISTS SEQUENCE storeuser_userid_seq MINVALUE 1;
+DROP IF EXISTS SEQUENCE author_authorid_seq START 10000;
+DROP IF EXISTS SEQUENCE book_isbn_seq START 10000;
+DROP IF EXISTS SEQUENCE publisher_publisherid_seq START 10000;
+DROP IF EXISTS SEQUENCE storeorder_ordernumber_seq START 10000;
+DROP IF EXISTS SEQUENCE storeuser_userid_seq START 10000;
 
 CREATE TABLE Publisher(
     publisherID SERIAL,
@@ -85,7 +85,7 @@ CREATE TABLE BookAuthors(
 CREATE TABLE BookGenres(
     genre varchar(255),
     isbn int,
-    PRIMARY KEY (isbn),
+    PRIMARY KEY (isbn,genre),
     FOREIGN KEY (isbn) references Book (isbn)
 );
 

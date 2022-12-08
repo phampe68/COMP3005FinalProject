@@ -70,11 +70,9 @@ app.post('/books', async(req,res)=>{
         const {name, numberOfPages, price, commission, stock, publisherID,genres,authors}=req.body;
         console.log(req.body);
         //const funcs = await pool.query("SELECT routine_name FROM information_schema.routines    WHERE         routine_type = 'FUNCTION'    AND       routine_schema = 'public';");
-        console.log(funcs.rows,funcs.rows.length);
         const newBook = await pool.query("SELECT * FROM Book_Register($1,$2,$3,$4,$5,$6)",[name, numberOfPages, price, commission, stock, publisherID]);
-        let newBookGenre;
-        let newBookAuthor;
-        
+        let newBookGenre=[];
+        let newBookAuthor=[];
         for(let i=0;i<genres.length;i++){
             console.log(newBook.rows[0].isbn,genres[i]);
             newBookGenre[i] = await pool.query("SELECT * FROM bookgenres_addgenre($1,$2)",[newBook.rows[0].isbn,genres[i]]);
