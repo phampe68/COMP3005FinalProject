@@ -39,6 +39,10 @@ function AdminHome() {
     useEffect(() => {
         axios.get(`http://localhost:5000/books/`).then(res => {
             setBooksFound(res.data);
+            console.log(res.data);
+            for (let book of res.data) {
+                bookOrders[book.book[0].isbn] = 0; 
+            }
         });
 
         axios.get(`http://localhost:5000/authors/`).then(res => {
@@ -48,6 +52,8 @@ function AdminHome() {
         axios.get(`http://localhost:5000/publishers/`).then(res => {
             setPublihsersList(res.data);
         });
+
+
     }, []);
 
     const [bookOrders, setBookOrders] = useState(() => {
@@ -152,21 +158,21 @@ function AdminHome() {
         let book = props.book.book[0];
         let author = props.book.authors[0];
         let genres = props.book.genres.map(x => x.genre);
+        const [count, setCount] = useState(0);
 
         const handleIncrement = (ISBN) => {
-            bookOrders[ISBN] = bookOrders[ISBN] + 1;
+            bookOrders[ISBN] = bookOrders[ISBN] ? bookOrders[ISBN] + 1 : 1;
             setBookOrders(bookOrders);
-            setCount(count + 1);
+            setCount(bookOrders[ISBN]);
         }
 
         const handleDecrement = (ISBN) => {
             if (bookOrders[ISBN] == 0) return;
-            bookOrders[ISBN] = bookOrders[ISBN] - 1;
+            bookOrders[ISBN] = bookOrders[ISBN] ? bookOrders[ISBN] - 1 : 0;
             setBookOrders(bookOrders);
-            setCount(count - 1);
+            setCount(bookOrders[ISBN]);
         }
 
-        const [count, setCount] = useState(0);
         return (
             <div>
                 <Card sx={{ minWidth: 275, borderColor: "primary.main" }}>
@@ -198,11 +204,11 @@ function AdminHome() {
                             <p>Order Quantity</p>
 
                             <ButtonGroup size="small" aria-label="small outlined button group" >
-                                <Button onClick={() => { handleIncrement(book.ISBN) }}>+</Button>
+                                <Button onClick={() => { handleIncrement(book.isbn) }}>+</Button>
                                 <Button>{
-                                    bookOrders[props.book.ISBN]
+                                    bookOrders[book.isbn]
                                 }</Button>
-                                <Button onClick={() => { handleDecrement(book.ISBN) }}>-</Button>
+                                <Button onClick={() => { handleDecrement(book.isbn) }}>-</Button>
                             </ButtonGroup>
                         </div>
                     </CardActions>
