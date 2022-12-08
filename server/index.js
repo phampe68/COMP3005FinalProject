@@ -9,22 +9,75 @@ const pool = require("./db");
 app.use(cors());
 app.use(express.json()); // gives access to request.body to get json data
 
-function parseJSON(j){
-    let output=[]
-    for (let i in j){
-        userid = j[i].userid
-        authorid = j[i].authorid
-        isbn = j[i].isbn
-        publisherid = j[i].publisherID
-        orderid = j[i].publisherID
-        console.log(userid)
-        console.log(authorid)
+
+/*
+    FUNCTION NAME: parseJSON(j)
+    ARGUMENTS: j, which is a list of json objects that contain ids.
+    RETURNS: j, which has been augmented with new stuff
+    PURPOSE: anywhere that there is an id, insert the relevant values for that id.
+    
+
+ EXAMPLE USE:
+ a = 
+ [
+    {
+        "userid":0
     }
+]
+ parseJSON(a) == 
+ [
+    {
+        "userid":0,
+        "user": 
+        {
+            "userid": 0,
+            "fname": "Test",
+            "lname": "User 1",
+            "address": "123 Example Street",
+            "email": "user1@gmail.com",
+            "phonenumber": "(123)-456-7890"
+        }
+    }
+]
+*/
+async function parseJSON(j){
+    
+    for (let i in j){
+        console.log("ji: ",j[i])
+        if(typeof j[i].userid !=="undefined"){
+            const user = await pool.query("SELECT * FROM StoreUser_GetByID($1)",[j[i].userid]);
+            j[i].user = user.rows[0]
+        }
+        if(typeof j[i].authorid !=="undefined"){
+            const author = await pool.query("SELECT * FROM Author_GetByID($1)",[j[i].authorid]);
+            j[i].author = author.rows[0]
+        }
+        if((typeof j[i].isbn !=="undefined")&&(j[i].name=="undefined")){
+            const book = await pool.query("SELECT * FROM Book_GetByID($1)",[j[i].isbn]);
+            j[i].book = book.rows[0]
+        }
+        if(typeof j[i].publisherid !=="undefined"){
+            const publisher = await pool.query("SELECT * FROM Publisher_GetByID($1)",[j[i].publisherid]);
+            j[i].publisher = publisher.rows[0]
+        }
+        if(typeof j[i].orderid !=="undefined"){
+            const order = await pool.query("SELECT * FROM StoreOrder_GetByID($1)",[j[i].orderid]);
+            j[i].order = order.rows[0]
+        }
+        
+    }
+    //console.log("j:",j)
+    return j;
+    
 }
 
 //ROUTES
 
 //register a user
+exampleUserPost=
+{
+
+}
 app.post('/users', async(req,res)=>{
     try {
         //should include fName,lName,address,email,phoneNumber
@@ -34,7 +87,7 @@ app.post('/users', async(req,res)=>{
         const newUser = await pool.query("SELECT * FROM StoreUser_Register($1,$2,$3,$4,$5)",[fName,lName,address,email,phoneNumber]);
         console.log(newUser.rows)
         
-        res.json(newUser.rows[0]);
+        res.json(parseJson(newUser.rows[0]));
     } catch (err) {
         console.error(err.message);
     }
@@ -58,7 +111,7 @@ app.get('/users/:id', async(req,res)=>{
         console.log(req.params);
         const {id}=req.params;
         const user = await pool.query("SELECT * FROM StoreUser_GetByID($1)",[id]);
-        res.json(user.rows);
+        res.json(parseJson(user.rows));
     } catch (err) {
         console.error(err.message);
     }
@@ -71,37 +124,62 @@ app.delete('/users/:id', async(req,res)=>{
         console.log(req.params);
         const {id}=req.params;
         const user = await pool.query("SELECT * FROM StoreUser_Delete($1)",[id]);
-        res.json(user.rows);
+        res.json(parseJson(user.rows));
     } catch (err) {
         console.error(err.message);
     }
 }
 );
 
-//register a book
+/*
+
+register a book
+
+
+exampleBookPost=
+{
+    "name": "Book Book",
+    "numberofpages": 123,
+    "price": "12.99",
+    "commission": "0.35",
+    "stock": 100,
+    "genres": ["Books","Non-Fiction"],
+    "publisherID": 0,
+    "authors": [0]
+}
+
+
+
+
+
+
+*/
 app.post('/books', async(req,res)=>{
     try {
         //should include name, numberOfPages, price, commission, stock, publisherID
           
         const {name, numberofpages, price, commission, stock, publisherID,genres,authors}=req.body;
-        console.log(req.body);
+        //console.log(req.body);
         const newBook = await pool.query("SELECT * FROM Book_Register($1,$2,$3,$4,$5,$6)",[name, numberofpages, price, commission, stock, publisherID]);
         let newBookGenre=[];
         let newBookAuthor=[];
         for(let i=0;i<genres.length;i++){
-            console.log(newBook.rows[0].isbn,genres[i]);
+            //console.log(newBook.rows[0].isbn,genres[i]);
             newgenre = await pool.query("SELECT * FROM bookgenres_addgenre($1,$2)",[newBook.rows[0].isbn,genres[i]]);
             newBookGenre[i] = newgenre.rows[0].genre
-            console.log(i)
+            //await parseJSON(newgenre.rows)
+            //console.log(i)
         }
         for(let i=0;i<authors.length;i++){
             newauthor = await pool.query("SELECT * FROM BookAuthors_AddAuthor($1,$2)",[newBook.rows[0].isbn,authors[i]]);
-            console.log(newauthor.rows[0])
-            authorinfo = await pool.query("SELECT * FROM Author_GetById($1)",[newauthor.rows[0].authorid]);
-            newBookAuthor[i] =authorinfo.rows[0]
+            //console.log(newauthor.rows[0])
+            //authorinfo = await pool.query("SELECT * FROM Author_GetById($1)",[newauthor.rows[0].authorid]);
+            newBookAuthor[i] = newauthor.rows[0]
         }
-        const publisher = await pool.query("SELECT * FROM Publisher_getbyid($1)",[publisherID]);
-        output = [newBook.rows[0],newBookAuthor,newBookGenre,publisher.rows]
+        //const publisher = await pool.query("SELECT * FROM Publisher_getbyid($1)",[publisherID]);
+        book = await parseJSON(newBook.rows)
+        author = await parseJSON(newBookAuthor)
+        output = {"book":book,"authors":author,"genres":newBookGenre}
         res.json(output);
     } catch (err) {
         console.error(err.message);
@@ -115,7 +193,10 @@ app.post('/books', async(req,res)=>{
 app.get("/books", async (req, res) => {
     try {
         const allBooks = await pool.query("SELECT * FROM Book_GetALL()");
-        res.json(allBooks.rows);
+        for (let i in allBooks.rows){
+            parseJSON(allBooks.rows[i])
+        }
+        res.json((allBooks.rows));
     } catch (err) {
         console.error(err.message);
     }
@@ -155,7 +236,8 @@ app.put('/books/:id', async(req,res)=>{
         const {id}=req.params;
         const {stock}=req.body;
         const book = await pool.query("SELECT * FROM Book_UpdateStock($1,$2)",[id,stock]);
-        res.json(book.rows);
+        let output = await parseJSON(book.rows);
+        res.json(output);
     } catch (err) {
         console.error(err.message);
     }
@@ -236,7 +318,8 @@ app.post('/bookauthors/', async(req,res)=>{
         console.log(req.body);
         const {authorID,isbn}=req.body;
         const selection = await pool.query("SELECT * FROM BookAuthors_AddAuthor($1,$2)",[authorID,isbn]);
-        res.json(selection.rows);
+        output = await parseJSON(selection.rows)
+        res.json(output);
     } catch (err) {
         console.error(err.message);
     }
@@ -250,7 +333,8 @@ app.get('/bookauthors/author/id', async(req,res)=>{
         console.log(req.body);
         const {authorID}=req.body;
         const selection = await pool.query("SELECT * FROM BookAuthors_GetByAuthor($1)",[authorID]);
-        res.json(selection.rows);
+        let output = await parseJSON(selection.rows);
+        res.json(output);
     } catch (err) {
         console.error(err.message);
     }
@@ -263,7 +347,8 @@ app.get('/bookauthors/book/id', async(req,res)=>{
         console.log(req.body);
         const {isbn}=req.body;
         const selection = await pool.query("SELECT * FROM BookAuthors_GetByBook($1)",[isbn]);
-        res.json(selection.rows);
+        let output = await parseJSON(selection.rows);
+        res.json(output);
     } catch (err) {
         console.error(err.message);
     }
@@ -271,6 +356,12 @@ app.get('/bookauthors/book/id', async(req,res)=>{
 );
 
 //add to book selections
+exampleSelectionsPost=
+{
+    "userID": 2,
+    "isbn": 0,
+    "quantity": 1
+}
 app.post('/selections/', async(req,res)=>{
     try {
         console.log(req.body);
@@ -280,8 +371,8 @@ app.post('/selections/', async(req,res)=>{
         if (selection.rows.length==0){
             selection = await pool.query("SELECT * FROM UserBookSelections_AddBook($1,$2,$3)",[userID,isbn,quantity]);
         }
-        
-        res.json(selection.rows);
+        output = await parseJSON(selection.rows)
+        res.json(output);
     } catch (err) {
         console.error(err.message);
     }
@@ -296,11 +387,8 @@ app.get('/selections/:id', async(req,res)=>{
         console.log(userID);
         
         const selection = await pool.query("SELECT * FROM UserBookSelections_GetById($1)",[userID]);
-        let books =[];
-        for (let i=0;i<selection.rows.length;i++){
-            const book = await pool.query("SELECT * FROM Book_GetById($1)",[selection.rows[i].isbn]);
-            books[i] = [selection.rows[i],book.rows[0]]
-        }
+        
+        let books = await parseJSON(selection.rows);
 
         res.json(books);
     } catch (err) {
@@ -315,17 +403,9 @@ app.get('/selections/:id', async(req,res)=>{
 app.get('/selections/', async(req,res)=>{
     try {
         const selection = await pool.query("SELECT * FROM UserBookSelections_GetAll()");
-        parseJSON(selection.rows);
-        let books = [];
-        //console.log(selection.rows.length)
-        for (let i=0;i<selection.rows.length;i++){
-            //console.log(selection.rows[i].isbn)
-            book = await pool.query("SELECT * FROM Book_GetById($1)",[selection.rows[i].isbn]);
-            books[i] = [selection.rows[i],book.rows[0]]
-            //console.log(books[i])
-        }
-
-        res.json(books);
+        let output = await parseJSON(selection.rows);
+        console.log("output:", output);
+        res.json(output);
     } catch (err) {
         console.error(err.message);
     }
@@ -338,7 +418,8 @@ app.delete('/selections/:id/:isbn', async(req,res)=>{
         console.log(req.params);
         const {userID,isbn}=req.body;
         const selection = await pool.query("SELECT * FROM UserBookSelections_Delete($1,$2)",[userID,isbn]);
-        res.json(selection.rows);
+        let output = await parseJSON(selection.rows);
+        res.json(output);
     } catch (err) {
         console.error(err.message);
     }
