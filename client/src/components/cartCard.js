@@ -10,10 +10,21 @@ import axios from 'axios';
 
 const CartCard = (props) => {
     let book = props.selection.book;
+    let user = localStorage.getItem("user");
     const removeFromCart = (e) => {
+
         axios.delete('http://localhost:5000/selections/' + localStorage.getItem("user") + "/" + book.isbn)
             .then(function (response) {
-                console.log(response);
+                // reload cart 
+                axios.get(`http://localhost:5000/selections/` + user).then(res => {
+
+                props.setCart(res.data);
+                let temp = 0;
+                for (let selection of res.data) {
+                    temp += selection.quantity * selection.book.price;
+                }
+                props.setTotalPrice(temp);
+            });
             })
             .catch(function (error) {
                 console.log(error);

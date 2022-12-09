@@ -70,7 +70,6 @@ function UserHome() {
         setUser(localStorage.getItem("user"));
 
         axios.get(`http://localhost:5000/selections/` + user).then(res => {
-
             setCart(res.data);
             let temp = 0;
             for (let selection of res.data) {
@@ -106,7 +105,7 @@ function UserHome() {
 
         let book = props.book.book[0];
         let author = props.book.authors[0];
-        let genres = props.book.genres.map(x=>x.genre);
+        let genres = props.book.genres.map(x => x.genre);
         const handleIncrement = (ISBN) => {
             setQuantity(quantity + 1);
         }
@@ -127,20 +126,14 @@ function UserHome() {
             })
                 .then(function (response) {
                     setQuantity(0);
-
-                    // update the cart
                     axios.get(`http://localhost:5000/selections/` + user).then(res => {
                         setCart(res.data);
+                        let temp = 0;
+                        for (let selection of res.data) {
+                            temp += selection.quantity * selection.book.price;
+                        }
+                        setTotalPrice(temp);
                     });
-
-                    // update the total
-                    let temp = 0;
-
-                    for (let selection of cart) {
-                        temp += selection[0].quantity * selection[1].price;
-                    }
-                    setTotalPrice(temp);
-
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -274,11 +267,11 @@ function UserHome() {
                     {cart ? cart.map((selection, index) => (
 
                         <Grid item xs={2} sm={4} md={4} key={index}>
-                            <CartCard selection={selection} index={index} />
+                            <CartCard selection={selection} index={index} setCart={setCart} setTotalPrice={setTotalPrice} />
                         </Grid>
                     )) : null}
                 </Grid>
-                <h2>Total Price $:{totalPrice}</h2>
+                <h2>Total Price ${totalPrice}</h2>
             </div>
 
 

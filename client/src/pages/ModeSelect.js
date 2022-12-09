@@ -48,12 +48,10 @@ function ModeSelect() {
             phoneNumber, phoneNumber
         })
             .then(function (response) {
-                setFName("");
-                setLName("");
-                setEmail("");
-                setPhoneNumber("");
-                navigate("/userHome");
-
+                // reload users
+                axios.get(`http://localhost:5000/users/`).then(res => {
+                    setUserList(res.data);
+                });
             })
             .catch(function (error) {
                 console.log(error);
@@ -65,9 +63,11 @@ function ModeSelect() {
             alert("No user selected.");
             return;
         }
+        let temp = currUser.split(":");
+        let currUserID = temp[1];
 
-        alert("go to user: " + currUser);
-        localStorage.setItem('user', currUser)
+        alert("go to user: " + currUserID);
+        localStorage.setItem('user', currUserID)
         navigate("/userHome");
     }
 
@@ -88,7 +88,7 @@ function ModeSelect() {
                     <Autocomplete
                         disablePortal
                         id="combo-box-demo"
-                        options={usersList.map(x => x.userid + '')}
+                        options={usersList.map(x => x.email + ":" + x.userid)}
                         sx={{ width: 300, marginRight: 2 }}
                         renderInput={(params) => <TextField {...params} label="User Select"
 
@@ -101,7 +101,7 @@ function ModeSelect() {
 
                 <h2>Can't see your user? Add a user here! (no password needed) </h2>
 
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", maxWidth: "80%" }}>
                     <TextField id="txtAddUser" label="First Name" variant="outlined" width sx={{ width: 300, marginRight: 2 }}
                         onChange={(e) => setFName(e.target.value)}
                     />

@@ -40,7 +40,7 @@ function AdminHome() {
             setBooksFound(res.data);
             console.log(res.data);
             for (let book of res.data) {
-                bookOrders[book.book[0].isbn] = 0; 
+                bookOrders[book.book[0].isbn] = 0;
             }
         });
 
@@ -91,7 +91,7 @@ function AdminHome() {
 
         // only add book if all fields are full
         if (!name || !numberOfPages || !price || !commission || !stock || !publisherID || !authors || !authorIDsToAdd) return;
-        
+
         axios.post('http://localhost:5000/books', {
             name: name,
             numberOfPages: numberOfPages,
@@ -153,7 +153,22 @@ function AdminHome() {
 
 
     const placeOrder = () => {
+        console.log(bookOrders);
         alert("PLACING ORDER");
+    }
+
+    const removeFromStore = (ISBN) => {
+        axios.delete("http://localhost:5000/books/" + ISBN).then(() => {
+            axios.get(`http://localhost:5000/books/`).then(res => {
+                setBooksFound(res.data);
+                console.log(res.data);
+                for (let book of res.data) {
+                    bookOrders[book.book[0].isbn] = 0;
+                }
+            });
+        }).catch((err) => {
+            console.log(err);
+        })
     }
 
     function BookOrderCard(props) {
@@ -198,7 +213,7 @@ function AdminHome() {
                         </Typography>
                     </CardContent>
                     <CardActions>
-                        <Button variant='outlined' color='error'>
+                        <Button variant='outlined' color='error' onClick={() => { removeFromStore(book.isbn) }}>
                             Remove From Store
                         </Button>
 

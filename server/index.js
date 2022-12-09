@@ -91,7 +91,7 @@ app.post('/users', async(req,res)=>{
         const newUser = await pool.query("SELECT * FROM StoreUser_Register($1,$2,$3,$4,$5)",[fName,lName,address,email,phoneNumber]);
         console.log(newUser.rows)
         
-        res.json(parseJson(newUser.rows[0]));
+        res.json(parseJSON(newUser.rows));
     } catch (err) {
         console.error(err.message);
     }
@@ -428,8 +428,10 @@ app.get('/selections/', async(req,res)=>{
 //delete book selections
 app.delete('/selections/:id/:isbn', async(req,res)=>{
     try {
-        console.log(req.params);
-        const {userID,isbn}=req.body;
+        const userID = req.params.id;
+        const isbn = req.params.isbn;
+
+        console.log(userID, isbn);
         const selection = await pool.query("SELECT * FROM UserBookSelections_Delete($1,$2)",[userID,isbn]);
         let output = await parseJSON(selection.rows);
         res.json(output);

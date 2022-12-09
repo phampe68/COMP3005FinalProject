@@ -277,12 +277,12 @@ $$
     Update UserBookSelections set quantity=quantity-$3 where userID=$1 and isbn=$2 RETURNING *;
 $$;
 
-CREATE OR REPLACE FUNCTION UserBookSelections_Delete(int)
+CREATE OR REPLACE FUNCTION UserBookSelections_Delete(int, int)
 returns setof UserBookSelections
 language 'sql'
 AS
 $$
-    DELETE FROM UserBookSelections where userID=$1 RETURNING *;
+    DELETE FROM UserBookSelections where userID=$1 and isbn=$2 RETURNING *;
 $$;
 
 CREATE OR REPLACE FUNCTION UserBookSelections_GetByID(int)
