@@ -109,17 +109,11 @@ returns Boolean
 language 'sql'
 AS
 $$
-BEGIN
-    SELECT ISBN FROM Book_GetRemovable()
-    where isbn=$1;
-    if found then
-        delete from BookAuthors where isbn=$1;
-        delete from BookGenres where isbn=$1;
-        delete from book where isbn=$1;
-        Return true;
-    end if;
-    return false; 
-END; $$;
+    DELETE FROM BookGenres where isbn=$1 and isbn in (select isbn from Book_GetRemovable());
+    DELETE FROM BookAuthors where isbn=$1 and isbn in (select isbn from Book_GetRemovable());
+    DELETE FROM Book where isbn=$1 and isbn in (select isbn from Book_GetRemovable());
+    SELECT NOT EXISTS (SELECT isbn from book where isbn=$1);
+$$;
 
 
 CREATE OR REPLACE FUNCTION Book_UpdateStock(int,int)

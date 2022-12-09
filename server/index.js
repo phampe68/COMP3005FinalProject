@@ -194,7 +194,7 @@ app.get("/books", async (req, res) => {
         let output=[]
         const allBooks = await pool.query("SELECT * FROM Book_GetALL()");
         for (let i in allBooks.rows){
-            book = await parseJSON([allBooks.rows[0]])
+            book = await parseJSON([allBooks.rows[i]])
             genres = await pool.query("SELECT genre FROM BookGenres_GetByBook($1)",[allBooks.rows[i].isbn]);
             authors = await pool.query("SELECT authorID,fName,lName from BookAuthors NATURAL JOIN Author where isbn=$1",[allBooks.rows[i].isbn])
             output.push({"book":book,"genres":genres.rows,"authors":authors.rows})
@@ -461,9 +461,9 @@ app.post('/storeorders/', async(req,res)=>{
 //get storeorders
 app.get('/storeorders/', async(req,res)=>{
     try {
-        const removeable = await pool.query("SELECT * FROM storeorder_GetALL()");
-        output = await parseJSON(removeable.rows)
-        res.json();
+        const orders = await pool.query("SELECT * FROM storeorder_GetALL()");
+        output = await parseJSON(orders.rows)
+        res.json(output);
     } catch (err) {
         console.error(err.message);
     }
