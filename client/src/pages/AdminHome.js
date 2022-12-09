@@ -33,7 +33,6 @@ function AdminHome() {
     const [price, setPrice] = useState();
     const [commission, setCommission] = useState();
     const [stock, setStock] = useState();
-    const [publisherID, setPublisherID] = useState();
     const [booksFound, setBooksFound] = useState([]);
 
     useEffect(() => {
@@ -81,14 +80,18 @@ function AdminHome() {
     }
 
     const addBook = () => {
-        // only add book if all fields are full
-        if (!name || !numberOfPages || !price || !commission || !stock || !publisherID || !authors) return;
-
+        console.log("HERE");
+        let temp = currPublisher.split(":");
+        let publisherID = temp[1];
         let authorIDsToAdd = [];
         for (let authorText of authors) {
-            let temp = authorText.split(":");
+            temp = authorText.split(":");
             authorIDsToAdd.push(temp[1]);
         }
+
+        // only add book if all fields are full
+        if (!name || !numberOfPages || !price || !commission || !stock || !publisherID || !authors || !authorIDsToAdd) return;
+        
         axios.post('http://localhost:5000/books', {
             name: name,
             numberOfPages: numberOfPages,
@@ -105,7 +108,6 @@ function AdminHome() {
             .catch(function (error) {
                 console.log(error);
             });
-
     }
 
 
@@ -303,7 +305,7 @@ function AdminHome() {
                 <Autocomplete
                     disablePortal
                     id="combo-box-demo"
-                    options={authorList.map(x => x.fname + ', ' + x.lname + ": " + x.authorid)}
+                    options={authorList.map(x => x.fname + ', ' + x.lname + ":" + x.authorid)}
                     sx={{ width: 300, marginRight: 2 }}
                     renderInput={(params) => <TextField {...params} label="Select Authors"
 
@@ -336,8 +338,8 @@ function AdminHome() {
                 <Autocomplete
                     disablePortal
                     id="combo-box-demo"
-                    options={publishersList.map(x => x.name + ": " + x.authorid)}
-                    sx={{ width: 300, marginRight: 2 }}
+                    options={publishersList.map(x => x.name + ":" + x.publisherid)}
+                    sx={{ width: 300, marginTop: 2 }}
                     renderInput={(params) => <TextField {...params} label="Select Publisher"
 
                     />}

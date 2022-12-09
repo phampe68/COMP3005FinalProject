@@ -247,9 +247,16 @@ app.put('/books/:id', async(req,res)=>{
     } catch (err) {
         console.error(err.message);
     }
-}
+});
 
-);
+app.get('/publishers', async(req, res) => {
+    try {
+        const allPublishers = await pool.query("SELECT * FROM publisher");        
+        res.json(allPublishers.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
 
 //register a publisher
 app.post('/publishers', async(req,res)=>{
