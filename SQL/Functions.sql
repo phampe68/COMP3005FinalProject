@@ -104,6 +104,14 @@ $$
     INSERT INTO Book (name, numberOfPages, price, commission, stock, publisherID) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;
 $$;
 
+CREATE OR REPLACE FUNCTION Book_GetRemovable()
+returns setof Book
+language 'sql'
+AS 
+$$
+    SELECT * FROM Book WHERE Book.isbn not in (select isbn from BookOrders) and Book.isbn not in (select isbn from UserBookSelections)
+$$;
+
 CREATE OR REPLACE FUNCTION Book_Remove(int)
 returns Boolean
 language 'sql'
@@ -301,11 +309,4 @@ $$
     SELECT * FROM UserBookSelections WHERE isbn = $1
 $$;
 
-CREATE OR REPLACE FUNCTION Book_GetRemovable()
-returns setof Book
-language 'sql'
-AS 
-$$
-    SELECT * FROM Book WHERE Book.isbn not in (select isbn from BookOrders) and Book.isbn not in (select isbn from UserBookSelections)
-$$;
 

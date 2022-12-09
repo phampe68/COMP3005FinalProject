@@ -8,11 +8,11 @@ DROP TABLE IF EXISTS BookOrders CASCADE;
 DROP TABLE IF EXISTS UserBookSelections CASCADE;
 DROP TABLE IF EXISTS StoreOrder CASCADE;
 DROP TABLE IF EXISTS BookGenres CASCADE;
-DROP IF EXISTS SEQUENCE author_authorid_seq START 10000;
-DROP IF EXISTS SEQUENCE book_isbn_seq START 10000;
-DROP IF EXISTS SEQUENCE publisher_publisherid_seq START 10000;
-DROP IF EXISTS SEQUENCE storeorder_ordernumber_seq START 10000;
-DROP IF EXISTS SEQUENCE storeuser_userid_seq START 10000;
+DROP SEQUENCE IF EXISTS author_authorid_seq;
+DROP SEQUENCE IF EXISTS book_isbn_seq;
+DROP SEQUENCE IF EXISTS publisher_publisherid_seq;
+DROP SEQUENCE IF EXISTS storeorder_ordernumber_seq;
+DROP SEQUENCE IF EXISTS storeuser_userid_seq;
 
 CREATE TABLE Publisher(
     publisherID SERIAL,
