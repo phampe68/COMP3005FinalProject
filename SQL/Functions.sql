@@ -40,7 +40,7 @@ $$
     INSERT INTO UserCards (userID,cardHolderName,cardNumber,expiryDate,securityCode) VALUES ($1,$2,$3,$4,$5) RETURNING *;
 $$;
 
-CREATE OR REPLACE FUNCTION StoreUser_GetByNumber(varchar)
+CREATE OR REPLACE FUNCTION UserCards_GetByNumber(varchar)
 returns setof UserCards
 language 'sql'
 AS 
@@ -48,6 +48,13 @@ $$
     SELECT * FROM UserCards WHERE cardNumber = $1
 $$;
 
+CREATE OR REPLACE FUNCTION UserCards_GetByNumber(int)
+returns setof UserCards
+language 'sql'
+AS 
+$$
+    SELECT * FROM UserCards WHERE userID = $1
+$$;
 
 CREATE OR REPLACE FUNCTION Publisher_GetByID(int)
 returns setof Publisher
