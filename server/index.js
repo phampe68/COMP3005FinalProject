@@ -253,9 +253,10 @@ app.put('/books/', async(req,res)=>{
     try {
         const data=req.body;
         let books=[]
-        const keys = Object.keys(data);
         
-        for (let [key,value] of Object.entries(keys)){
+
+        for (let [key,value] of Object.entries(data)){
+
             let book = await pool.query("SELECT * FROM Book_UpdateStock($1,$2)",[key,value]);
             console.log(key,value)
             console.log("book rows: ",book.rows)
@@ -263,7 +264,6 @@ app.put('/books/', async(req,res)=>{
         }
         
         let output = await parseJSON(books);
-        console.log(books)
         res.json(output);
     } catch (err) {
         console.error(err.message);

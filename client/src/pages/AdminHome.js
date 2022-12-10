@@ -169,8 +169,17 @@ function AdminHome() {
 
 
     const placeOrder = () => {
-        alert("PLACING ORDER");
-        console.log(bookOrders);
+        axios.put('http://localhost:5000/books', bookOrders).then(() => {
+            setBookOrders({});
+            // refresh authors
+            axios.get(`http://localhost:5000/books/`).then(res => {
+                setBooksFound(res.data);
+            });
+
+        })
+            .catch(function (error) {
+                console.log(error);
+            });
 
     }
 
