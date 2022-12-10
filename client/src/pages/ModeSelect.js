@@ -34,7 +34,7 @@ function ModeSelect() {
         if (fName === "" || lName === "" || email === "" || phoneNumber === "") {
             alert("Missing Fields");
             return;
-        } else if (usersList.filter(x => x.email == email).length > 0) {
+        } else if (usersList.filter(x => x.email === email).length > 0) {
             alert("User already exists")
             return;
         }

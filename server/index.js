@@ -273,6 +273,7 @@ app.post('/publishers', async(req,res)=>{
 }
 );
 
+
 //get a publisher
 app.get('/publishers/:id', async(req,res)=>{
     try {
@@ -573,7 +574,59 @@ app.get('/books/removable', async(req,res)=>{
 );
 
 app.get('/reports/', async(req,res)=>{
+    try {
+        // go through orders -> find all books that have been sold -> prices and commissions and publishers, calculate how much commission is going to publisher, total sales
+        // generate some 
+        let output=[]
 
+        // join orders with books
+        const booksOrdered = await pool.query("SELECT * FROM book, bookorders WHERE bookorders.isbn = book.isbn");
+        console.log(booksOrdered);
+        
+        let sales = 0;
+        let expenditures = 0;
+        let salesPerGenre = {};
+        let salesPerAuthor = {};
+        for (let book of booksOrdered.rows) {
+            sales += book.price * book.quantity;
+            expenditures += book.price * book.quantity * book.commission;
+
+            // get genres for this book
+            const currGenres = await pool.query("SELECT genre FROM bookgenres WHERE isbn = " + book.isbn);
+
+            // for each genre, add to sales per genre
+            for (let genreEntry of currGenres.rows) {
+                let genre = genreEntry.genre;
+                console.log(genre);
+
+                salesPerGenre[genre] = salesPerGenre[genre] ? salesPerGenre[genre] + book.price * book.quantity : book.price * book.quantity;
+            }
+
+            const currAuthors = await pool.query("SELECT authorid FROM bookauthors WHERE isbn = " + book.isbn);
+            for (let authorEntry of currAuthors.rows) {
+                let author = authorEntry.authorid;
+                console.log(author);
+
+                salesPerAuthor[author] = salesPerAuthor[author] ? salesPerAuthor[author] + book.price * book.quantity : book.price * book.quantity;
+            }
+        }
+
+        // round values
+        sales = sales.toFixed(2);
+        expenditures = expenditures.toFixed(2);
+
+        
+        console.log(sales, expenditures, salesPerGenre, salesPerAuthor);
+        res.json({
+            sales: sales,
+            expenditures: expenditures,
+            salesPerGenre: salesPerGenre,
+            salesPerAuthor: salesPerAuthor
+        });
+
+    } catch (err) {
+        console.error(err.message);
+    }
 }
 );
 
