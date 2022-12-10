@@ -40,22 +40,21 @@ app.use(express.json()); // gives access to request.body to get json data
     }
 ]
 */
-async function parseJSON(j) {
-
-    for (let i in j) {
-        //console.log("ji: ",j[i])
-        if ((typeof j[i].userid !== "undefined") && (typeof j[i].fname == "undefined")) {
-            const user = await pool.query("SELECT * FROM StoreUser_GetByID($1)", [j[i].userid]);
+async function parseJSON(j){
+    
+    for (let i in j){
+        
+        if((typeof j[i].userid !=="undefined")&&(typeof j[i].fname=="undefined")){
+            const user = await pool.query("SELECT * FROM StoreUser_GetByID($1)",[j[i].userid]);
             j[i].user = user.rows[0]
         }
         if ((typeof j[i].authorid !== "undefined") && (typeof j[i].fname == "undefined")) {
             const author = await pool.query("SELECT * FROM Author_GetByID($1)", [j[i].authorid]);
             j[i].author = author.rows[0]
         }
-        //console.log(j[i].isbn)
-        //console.log(j[i].name)
-        if ((typeof j[i].isbn !== "undefined") && (typeof j[i].name == "undefined")) {
-            const book = await pool.query("SELECT * FROM Book_GetByID($1)", [j[i].isbn]);
+        
+        if((typeof j[i].isbn !=="undefined")&&(typeof j[i].name=="undefined")){
+            const book = await pool.query("SELECT * FROM Book_GetByID($1)",[j[i].isbn]);
             j[i].book = book.rows[0]
         }
         if (typeof j[i].publisherid !== "undefined") {
@@ -66,10 +65,9 @@ async function parseJSON(j) {
             const order = await pool.query("SELECT * FROM StoreOrder_GetByID($1)", [j[i].orderid]);
             j[i].order = order.rows[0]
         }
-        //console.log(j[i])
-
+        
     }
-    //console.log("j:",j)
+
     return j;
 
 }
@@ -135,6 +133,38 @@ app.delete('/users/:id', async (req, res) => {
     }
 }
 );
+
+
+app.post('/usercards', async(req,res)=>{
+    try {
+        //should include userID,cardHolderName,cardNumber,expiryDate,securityCode
+        const {userID,cardHolderName,cardNumber,expiryDate,securityCode}=req.body;
+        console.log(req.body);
+        const newCard = await pool.query("SELECT * FROM UserCards_Register($1,$2,$3,$4,$5)",[userID,cardHolderName,cardNumber,expiryDate,securityCode]);
+        console.log(newCard.rows)
+        
+        res.json(parseJSON(newCard.rows));
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+);
+
+//get a cards of a user
+app.get('/usercards/:id', async(req,res)=>{
+    try {
+        console.log(req.params);
+        const {id}=req.params;
+        const card = await pool.query("SELECT * FROM UserCards_GetByID($1)",[id]);
+        output = parseJSON(card.rows)
+        res.json(output);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+);
+
+
 
 /*
 
@@ -281,13 +311,15 @@ app.get('/publishers', async (req, res) => {
     }
 });
 
+
+
 //register a publisher
 app.post('/publishers', async (req, res) => {
     try {
         //should include name, address, email, phoneNumber
-        const {name,address,email,phoneNumber,bankaccountnumber}=req.body;
+        const {name,address,email,phonenumber,bankaccountnumber}=req.body;
         console.log(req.body);
-        const newPublisher = await pool.query("SELECT * FROM Publisher_Register($1,$2,$3,$4,$5)",[name,address,email,phoneNumber,bankaccountnumber]);
+        const newPublisher = await pool.query("SELECT * FROM Publisher_Register($1,$2,$3,$4,$5)",[name,address,email,phonenumber,bankaccountnumber]);
         console.log(newPublisher.rows);
         res.json(newPublisher.rows[0]);
     } catch (err) {
