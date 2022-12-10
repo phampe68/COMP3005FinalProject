@@ -285,9 +285,9 @@ app.get('/publishers', async (req, res) => {
 app.post('/publishers', async (req, res) => {
     try {
         //should include name, address, email, phoneNumber
-        const { name, address, email, phoneNumber } = req.body;
+        const {name,address,email,phoneNumber,bankaccountnumber}=req.body;
         console.log(req.body);
-        const newPublisher = await pool.query("SELECT * FROM Publisher_Register($1,$2,$3,$4)", [name, address, email, phoneNumber]);
+        const newPublisher = await pool.query("SELECT * FROM Publisher_Register($1,$2,$3,$4,$5)",[name,address,email,phoneNumber,bankaccountnumber]);
         console.log(newPublisher.rows);
         res.json(newPublisher.rows[0]);
     } catch (err) {
@@ -487,7 +487,7 @@ app.post('/storeorders/', async (req, res) => {
         const { shippingaddress, courier, locationintransit, userid, cardnumber } = req.body;
         const d = new Date();
         let dtime = d.toDateString();
-        const order = await pool.query("SELECT * FROM StoreOrder_Register($1,$2,$3,$4,$5)", [shippingaddress, courier, locationintransit, dtime, userid]);
+        const order = await pool.query("SELECT * FROM StoreOrder_Register($1,$2,$3,$4,$5)",[shippingaddress,courier,locationintransit,dtime,userid,cardnumber]);
         res.json(order.rows);
     } catch (err) {
         console.error(err.message);
