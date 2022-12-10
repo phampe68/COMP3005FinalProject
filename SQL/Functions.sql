@@ -48,12 +48,12 @@ $$
     SELECT * FROM Publisher;
 $$;
 
-CREATE OR REPLACE FUNCTION Publisher_Register(varchar,varchar,varchar,varchar)
+CREATE OR REPLACE FUNCTION Publisher_Register(varchar,varchar,varchar,varchar,varchar)
 returns setof Publisher
 language 'sql'
 AS
 $$
-    INSERT INTO Publisher (name,address,email,phoneNumber) VALUES ($1,$2,$3,$4) RETURNING *;
+    INSERT INTO Publisher (name,address,email,phoneNumber,bankAccountNumber) VALUES ($1,$2,$3,$4,$5) RETURNING *;
 $$;
 
 CREATE OR REPLACE FUNCTION Author_Register(varchar,varchar)
