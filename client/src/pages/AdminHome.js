@@ -12,8 +12,48 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import GenreItem from "../components/genreItem";
 import axios from 'axios';
+import Report from '../components/report';
 
-
+const data = {
+    "sales": "299.98",
+    "expenditures": "15.00",
+    "salesPerGenre": [
+        {
+            "genre": "Fantastical",
+            "sales": 299.98
+        },
+        {
+            "genre": "Horror",
+            "sales": 299.98
+        },
+        {
+            "genre": "Action",
+            "sales": 299.98
+        }
+    ],
+    "salesPerAuthor": [
+        {
+            "author": {
+                "authorid": 0,
+                "fname": "Jolkien Rolkien Rolkien",
+                "lname": "Tolkien"
+            },
+            "sales": 299.98
+        }
+    ],
+    "salesPerPublisher": [
+        {
+            "publisher": {
+                "publisherid": 0,
+                "name": "Random Book Publishing Co.",
+                "address": "734 Random Street",
+                "email": "contact@rbps.com",
+                "phonenumber": "0118 999 881 999 119 725 3"
+            },
+            "sales": "15.00"
+        }
+    ]
+};
 /*
 Page that shows a bunch of books 
 */
@@ -414,12 +454,13 @@ function AdminHome() {
                 Add Book
             </Button>
 
-            
+
         </div>
         <hr style={{ width: "100%", margin: "2%" }} />
-        <div>
+        <div style={{ width: "80%" }}>
             <h1>Reports /</h1>
             <Button variant='contained'> Refresh Report </Button>
+            <Report data={data} />
         </div>
 
     </div>
