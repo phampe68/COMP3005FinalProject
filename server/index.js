@@ -454,17 +454,6 @@ app.delete('/selections/:id/:isbn', async (req, res) => {
 }
 );
 
-//update book selections
-app.put('/selections/:id/:isbn', async (req, res) => {
-    try {
-        const { userID, isbn } = req.params;
-        const selection = await pool.query("SELECT * FROM UserBookSelections_AddQuantity($1,$2,$3)", [userID, isbn]);
-        res.json(selection.rows);
-    } catch (err) {
-        console.error(err.message);
-    }
-}
-);
 
 //orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID,cardnumber
 
