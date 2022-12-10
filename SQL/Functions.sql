@@ -180,12 +180,12 @@ $$
     SELECT * FROM BookGenres WHERE GENRE = $1
 $$;
 
-CREATE OR REPLACE FUNCTION StoreOrder_Register(varchar,varchar,boolean,varchar,timestamp,int)
+CREATE OR REPLACE FUNCTION StoreOrder_Register(varchar,varchar,varchar,timestamp,int)
 returns setof StoreOrder
 language 'sql'
 AS
 $$
-    INSERT INTO StoreOrder (shippingaddress,courier,deliverystatus,locationintransit,dtime,userid) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;
+    INSERT INTO StoreOrder (shippingaddress,courier,deliverystatus,locationintransit,dtime,userid) VALUES ($1,$2,False,$3,$4,$5) RETURNING *;
 $$;
 
 CREATE OR REPLACE FUNCTION StoreOrder_GetAll()

@@ -454,12 +454,16 @@ app.put('/selections/:id/:isbn', async(req,res)=>{
 }
 );
 
+//orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID
+
 //create order
 app.post('/storeorders/', async(req,res)=>{
     try {
         console.log(req.body);
-        const {}=req.body;
-        const order = await pool.query("SELECT * FROM StoreOrder_Post($1,$2,$3)",[]);
+        const {shippingaddress,courier,locationintransit,userid}=req.body;
+        const d = new Date();
+        let dtime = d.toDateString();
+        const order = await pool.query("SELECT * FROM StoreOrder_Register($1,$2,$3,$4,$5)",[shippingaddress,courier,locationintransit,dtime,userid]);
         res.json(order.rows);
     } catch (err) {
         console.error(err.message);
