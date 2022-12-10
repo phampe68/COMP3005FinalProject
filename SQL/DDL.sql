@@ -20,7 +20,7 @@ CREATE TABLE Publisher(
     address VARCHAR (255),
     email VARCHAR (255) UNIQUE,
     phoneNumber VARCHAR (255) UNIQUE,
-    bankAccountNumber VARCHAR UNIQUE (255),
+    bankAccountNumber VARCHAR (255) UNIQUE,
     PRIMARY KEY (publisherID)
 );
 
