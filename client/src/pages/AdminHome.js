@@ -74,7 +74,7 @@ function AdminHome() {
     const [publisherAddress, setPublisherAddress] = useState("");
     const [publisherEmail, setPublisherEmail] = useState("");
     const [publisherPhoneNumber, setPublisherPhoneNumber] = useState("");
-
+    const [publisherBankAccountNumber, setPublisherBankAccountNumber] = useState("");
     const addGenre = (e) => {
         if (!currGenre || genres.includes(currGenre)) return;
         setGenres([...genres, currGenre]);
@@ -90,10 +90,8 @@ function AdminHome() {
             authorIDsToAdd.push(temp[1]);
         }
 
-        console.log("CURR AUTHOR IS ", currAuthor);
-
         // only add book if all fields are full
-        if (!name || !numberOfPages || !price || !commission || !stock || !publisherID || !authors || authorIDsToAdd.length === 0) return;
+        if (!name || !numberOfPages || !price || !commission || !stock || !publisherID || !authors || authorIDsToAdd.length === 0 || !publisherBankAccountNumber) return;
 
         axios.post('http://localhost:5000/books', {
             name: name,
@@ -172,7 +170,7 @@ function AdminHome() {
 
     const placeOrder = () => {
         alert("PLACING ORDER");
-
+        console.log(bookOrders);
 
     }
 
@@ -204,7 +202,7 @@ function AdminHome() {
         }
 
         const handleDecrement = (ISBN) => {
-            if (bookOrders[ISBN] == 0) return;
+            if (bookOrders[ISBN] === 0) return;
             bookOrders[ISBN] = bookOrders[ISBN] ? bookOrders[ISBN] - 1 : 0;
             setBookOrders(bookOrders);
             setCount(bookOrders[ISBN]);
@@ -323,6 +321,9 @@ function AdminHome() {
                 <TextField id="txtAddPublisher" label="Phone Number" variant="outlined" width sx={{ width: 300, marginRight: 2 }}
                     onChange={(e) => setPublisherPhoneNumber(e.target.value)}
                 />
+                <TextField id="txtAddPublisher" label="Bank Account" variant="outlined" width sx={{ width: 300, marginRight: 2 }}
+                    onChange={(e) => setPublisherBankAccountNumber(e.target.value)}
+                />
                 <Button variant="contained" style={{ maxHeight: '40px' }} onClick={addPublisher}> Add Publisher</Button>
             </div>
             <hr style={{ width: "100%", margin: "2%" }} />
@@ -403,8 +404,14 @@ function AdminHome() {
             <Button onClick={addBook} variant='contained' style={{ minHeight: '50px', marginTop: "2%" }}>
                 Add Book
             </Button>
-        </div>
 
+            
+        </div>
+        <hr style={{ width: "100%", margin: "2%" }} />
+        <div>
+            <h1>Reports /</h1>
+            <Button variant='contained'> Refresh Report </Button>
+        </div>
 
     </div>
 }

@@ -158,7 +158,7 @@ function UserHome() {
                     </Typography>
                     {authors.map((author, index) => (
                         <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                            {author.fname + ", " + author.lname}
+                            {author.fname + ", " + author.lname }
                         </Typography>
                     ))}
                     <Typography variant="h5" component="div">
