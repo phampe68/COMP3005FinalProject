@@ -104,7 +104,7 @@ function UserHome() {
         const [quantity, setQuantity] = useState(0);
 
         let book = props.book.book[0];
-        let author = props.book.authors[0];
+        let authors = props.book.authors;
         let genres = props.book.genres.map(x => x.genre);
         const handleIncrement = (ISBN) => {
             setQuantity(quantity + 1);
@@ -150,12 +150,25 @@ function UserHome() {
                     <Typography variant="h5" component="div">
                         {book.name}
                     </Typography>
-                    <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                        {author.fname + ", " + author.lname + " - " + book.publisher.name}
+                    <Typography variant="body" component="div">
+                        {"Publisher: " + book.publisher.name}
+                    </Typography> 
+                    <Typography variant="h5" component="div">
+                        Authors
                     </Typography>
-                    <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                        {genres}
+                    {authors.map((author, index) => (
+                        <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                            {author.fname + ", " + author.lname}
+                        </Typography>
+                    ))}
+                    <Typography variant="h5" component="div">
+                        Genres
                     </Typography>
+                    {genres.map((genre, index) => (
+                        <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                            {genre}
+                        </Typography>
+                    ))}
                     <Typography variant="body1" color="yellow">
 
                         {"Price: $" + book.price}

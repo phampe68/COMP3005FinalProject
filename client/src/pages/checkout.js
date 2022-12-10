@@ -1,45 +1,12 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Button, TextField } from '@mui/material';
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
+import CartCard from "../components/cartCard";
+import Grid from '@mui/material/Grid';
 
-const cart = [
-    {
-        ISBN: 123456,
-        name: "Harry Potter",
-        authorName: "JK Rowling",
-        publisherName: "Penguin",
-        genres: ["Magic", "Adventure", "Mystery"],
-        price: 20
-    },
-    {
-        ISBN: 123457,
-        name: "Harry Potter",
-        authorName: "JK Rowling",
-        publisherName: "Penguin",
-        genres: ["Magic", "Adventure", "Mystery"],
-        price: 20
-
-    },
-    {
-        ISBN: 123458,
-        name: "Harry Potter",
-        authorName: "JK Rowling",
-        publisherName: "Penguin",
-        genres: ["Magic", "Adventure", "Mystery"],
-        price: 20
-
-    },
-    {
-        ISBN: 123459,
-        name: "Harry Potter",
-        authorName: "JK Rowling",
-        publisherName: "Penguin",
-        genres: ["Magic", "Adventure", "Mystery"],
-        price: 20
-    },
-]
 
 
 /*
@@ -50,18 +17,51 @@ function Checkout() {
 
     //TODO: make a query here to get cart and calculate total
     let total = 0; 
+    const[cart, setCart] = useState([]);
+    const[totalPrice, setTotalPrice] = useState(0);
     const [address, setAddress] = useState("");
     const [cardNumber, setCardNumber] = useState("");
     const [cardHolderName, setCardHolderName] = useState("");
     const [expiryDate, setExpiryDate] = useState("");
     const [cvc, setCvc] = useState("");
 
+    useEffect(() => {
+        const user = localStorage.getItem("user");
+
+        axios.get(`http://localhost:5000/selections/` + user).then(res => {
+            setCart(res.data);
+            let temp = 0;
+            for (let selection of res.data) {
+                temp += selection.quantity * selection.book.price;
+            }
+            setTotalPrice(temp);
+        });
+
+    }, []);
+
+
+    const completeOrder = () => {
+
+    }
+    
     return (
         <div style={{ display: "flex", padding: "2%", width: "100%", flexDirection: "column" }}>
             <div style={{ display: "flex", flexDirection: "column" }}>
 
                 <h1>Checkout Page</h1>
 
+                <div>
+                <h2>Cart</h2>
+                <Grid style={{ marginTop: "5px", width: "100%", paddingBottom: "2%", alignItems: "center" }} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+                    {cart ? cart.map((selection, index) => (
+
+                        <Grid item xs={2} sm={4} md={4} key={index}>
+                            <CartCard selection={selection} index={index} setCart={setCart} setTotalPrice={setTotalPrice} />
+                        </Grid>
+                    )) : null}
+                </Grid>
+                <h2>Total Price ${totalPrice}</h2>
+            </div>
                 <h2>Add Billing and Shipping Information:</h2>
                 <div style={{marginBottom: "2%"}}>
                     <TextField onChange={(e) => setAddress(e.target.value)} id="txtAddress" label="Enter Address" variant="outlined" width sx={{ width: 300, marginRight: 4 }}/>
@@ -79,7 +79,7 @@ function Checkout() {
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center" }}>
-                    <Button onClick={() => {navigate('/checkout');}} variant="outlined" style={{ minHeight: '80px' }}> Purchase </Button>
+                    <Button onClick={completeOrder} variant="outlined" style={{ minHeight: '80px' }}> Complete Order </Button>
                 </div>
             </div>
         </div>

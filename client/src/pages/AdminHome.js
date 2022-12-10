@@ -38,10 +38,11 @@ function AdminHome() {
     useEffect(() => {
         axios.get(`http://localhost:5000/books/`).then(res => {
             setBooksFound(res.data);
-            console.log(res.data);
+            console.log("BOOKS FOUND: ", res.data);
             for (let book of res.data) {
                 bookOrders[book.book[0].isbn] = 0;
             }
+
         });
 
         axios.get(`http://localhost:5000/authors/`).then(res => {
@@ -80,7 +81,7 @@ function AdminHome() {
     }
 
     const addBook = () => {
-        console.log("HERE");
+
         let temp = currPublisher.split(":");
         let publisherID = temp[1];
         let authorIDsToAdd = [];
@@ -89,8 +90,10 @@ function AdminHome() {
             authorIDsToAdd.push(temp[1]);
         }
 
+        console.log("CURR AUTHOR IS ", currAuthor);
+
         // only add book if all fields are full
-        if (!name || !numberOfPages || !price || !commission || !stock || !publisherID || !authors || !authorIDsToAdd) return;
+        if (!name || !numberOfPages || !price || !commission || !stock || !publisherID || !authors || authorIDsToAdd.length === 0) return;
 
         axios.post('http://localhost:5000/books', {
             name: name,
@@ -103,7 +106,13 @@ function AdminHome() {
             authors: authorIDsToAdd
         })
             .then(function (response) {
-
+                // refresh
+                axios.get(`http://localhost:5000/books/`).then(res => {
+                    setBooksFound(res.data);
+                    for (let book of res.data) {
+                        bookOrders[book.book[0].isbn] = 0;
+                    }
+                });
             })
             .catch(function (error) {
                 console.log(error);
@@ -119,6 +128,11 @@ function AdminHome() {
         }).then(() => {
             setAuthorFName("");
             setAuthorLName("");
+            // refresh authors
+            axios.get(`http://localhost:5000/authors/`).then(res => {
+                setAuthorList(res.data);
+            });
+
         })
             .catch(function (error) {
                 console.log(error);
@@ -140,6 +154,10 @@ function AdminHome() {
                 setPublisherAddress("");
                 setPublisherEmail("");
                 setPublisherPhoneNumber("");
+
+                axios.get(`http://localhost:5000/publishers/`).then(res => {
+                    setPublihsersList(res.data);
+                });
             })
             .catch(function (error) {
                 console.log(error);
@@ -153,8 +171,9 @@ function AdminHome() {
 
 
     const placeOrder = () => {
-        console.log(bookOrders);
         alert("PLACING ORDER");
+
+
     }
 
     const removeFromStore = (ISBN) => {
@@ -173,7 +192,8 @@ function AdminHome() {
 
     function BookOrderCard(props) {
         let book = props.book.book[0];
-        let author = props.book.authors[0];
+
+        let authors = props.book.authors;
         let genres = props.book.genres.map(x => x.genre);
         const [count, setCount] = useState(0);
 
@@ -200,9 +220,27 @@ function AdminHome() {
                         <Typography variant="h5" component="div">
                             {book.name}
                         </Typography>
-                        <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                            {author.fname + ", " + author.lname + " - " + book.publisher.name}
+
+                        <Typography variant="body" component="div">
+                            {"Publisher:" + book.publisher.name}
                         </Typography>
+                        <Typography variant="h5" component="div">
+                            Authors
+                        </Typography>
+
+                        {authors.map((author, index) => (
+                            <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                                {author.fname + ", " + author.lname}
+                            </Typography>
+                        ))}
+                        <Typography variant="h5" component="div">
+                            Genres
+                        </Typography>
+                        {genres.map((genre, index) => (
+                            <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                                {genre}
+                            </Typography>
+                        ))}
                         <Typography variant="body1" color="yellow">
 
                             {"Price: $" + book.price}
