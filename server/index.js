@@ -259,6 +259,7 @@ app.put('/books/', async(req,res)=>{
 
             let book = await pool.query("SELECT * FROM Book_UpdateStock($1,$2)",[key,value]);
             console.log(key,value)
+            console.log("book rows: ",book.rows)
             books.push(book.rows)
         }
         
@@ -477,13 +478,13 @@ app.put('/selections/:id/:isbn', async(req,res)=>{
 }
 );
 
-//orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID
+//orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID,cardnumber
 
 //create order
 app.post('/storeorders/', async(req,res)=>{
     try {
         console.log(req.body);
-        const {shippingaddress,courier,locationintransit,userid}=req.body;
+        const {shippingaddress,courier,locationintransit,userid,cardnumber}=req.body;
         const d = new Date();
         let dtime = d.toDateString();
         const order = await pool.query("SELECT * FROM StoreOrder_Register($1,$2,$3,$4,$5)",[shippingaddress,courier,locationintransit,dtime,userid]);
