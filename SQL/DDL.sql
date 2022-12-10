@@ -18,8 +18,9 @@ CREATE TABLE Publisher(
     publisherID SERIAL,
     name VARCHAR (255),
     address VARCHAR (255),
-    email VARCHAR (255),
-    phoneNumber VARCHAR (255),
+    email VARCHAR (255) UNIQUE,
+    phoneNumber VARCHAR (255) UNIQUE,
+    bankAccountNumber VARCHAR UNIQUE (255),
     PRIMARY KEY (publisherID)
 );
 
@@ -28,7 +29,7 @@ CREATE TABLE StoreUser(
     fName VARCHAR (255),
     lName VARCHAR (255),
     address VARCHAR (255),
-    email VARCHAR (255),
+    email VARCHAR (255) UNIQUE,
     phoneNumber VARCHAR (255),
     PRIMARY KEY (userID)
 );
@@ -70,8 +71,10 @@ CREATE TABLE StoreOrder(
     locationInTransit VARCHAR (255),
     dtime timestamp,
     userID int,
+    cardNumber VARCHAR,
     PRIMARY KEY (orderNumber),
-    FOREIGN KEY (userID) references StoreUser (userID)
+    FOREIGN KEY (userID) references StoreUser (userID),
+    FOREIGN KEY (cardNumber) references UserCards (cardNumber)
 );
 
 CREATE TABLE BookAuthors(
