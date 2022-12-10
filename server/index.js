@@ -14,8 +14,7 @@ app.use(express.json()); // gives access to request.body to get json data
     FUNCTION NAME: parseJSON(j)
     ARGUMENTS: j, which is a list of json objects that contain ids.
     RETURNS: j, which has been augmented with new stuff
-    PURPOSE: anywhere that there is an id, insert the relevant values for that id.
-    
+    PURPOSE: anywhere that there is an id, insert the relevant values for that id, unless the parent object is of the id's type.
 
  EXAMPLE USE:
  a = 
@@ -74,21 +73,12 @@ async function parseJSON(j){
 
 //ROUTES
 
-/*register a user
-exampleUserPost=
-{
-
-}
-*/
+//register a user
 app.post('/users', async (req, res) => {
     try {
         //should include fName,lName,address,email,phoneNumber
-
         const { fName, lName, address, email, phoneNumber } = req.body;
-        console.log(req.body);
         const newUser = await pool.query("SELECT * FROM StoreUser_Register($1,$2,$3,$4,$5)", [fName, lName, address, email, phoneNumber]);
-        console.log(newUser.rows)
-
         res.json(parseJSON(newUser.rows));
     } catch (err) {
         console.error(err.message);
@@ -109,7 +99,6 @@ app.get("/users", async (req, res) => {
 //get a user with id
 app.get('/users/:id', async (req, res) => {
     try {
-        console.log(req.params);
         const { id } = req.params;
         const user = await pool.query("SELECT * FROM StoreUser_GetByID($1)", [id]);
         output = parseJSON(user.rows)
@@ -120,7 +109,7 @@ app.get('/users/:id', async (req, res) => {
 }
 );
 
-//get a user
+//delete a user
 app.delete('/users/:id', async (req, res) => {
     try {
         console.log(req.params);
@@ -134,7 +123,7 @@ app.delete('/users/:id', async (req, res) => {
 }
 );
 
-
+//register a card to a user
 app.post('/usercards', async(req,res)=>{
     try {
         //should include userID,cardHolderName,cardNumber,expiryDate,securityCode
@@ -166,11 +155,7 @@ app.get('/usercards/:id', async(req,res)=>{
 
 
 
-/*
-
-register a book
-
-
+/*register a book
 exampleBookPost=
 {
     "name": "Book Book",
@@ -182,17 +167,10 @@ exampleBookPost=
     "publisherID": 0,
     "authors": [0]
 }
-
-
-
-
-
-
 */
 app.post('/books', async (req, res) => {
     try {
         //should include name, numberOfPages, price, commission, stock, publisherID
-
         const { name, numberofpages, price, commission, stock, publisherID, genres, authors } = req.body;
         const newBook = await pool.query("SELECT * FROM Book_Register($1,$2,$3,$4,$5,$6)", [name, numberofpages, price, commission, stock, publisherID]);
         let newBookGenre = [];
@@ -235,10 +213,9 @@ app.get("/books", async (req, res) => {
     }
 });
 
-//get a book
+//get a book by isbn
 app.get('/books/:id', async (req, res) => {
     try {
-        console.log(req.params);
         const { id } = req.params;
         const book = await pool.query("SELECT * FROM Book_GetByID($1)", [id]);
         parsedbook = await parseJSON(book.rows)
@@ -252,7 +229,7 @@ app.get('/books/:id', async (req, res) => {
 }
 );
 
-//remove a book
+//remove a book by id
 app.delete('/books/:id', async (req, res) => {
     try {
         console.log(req.params);
@@ -265,7 +242,7 @@ app.delete('/books/:id', async (req, res) => {
 }
 );
 
-//order a book
+//admin orders a book, by updating the stock corresonding to isbn
 app.put('/books/:id', async (req, res) => {
     try {
         console.log(req.params);
@@ -279,6 +256,7 @@ app.put('/books/:id', async (req, res) => {
     }
 });
 
+//update a whole bunch of books using a map from isbn to quantity
 app.put('/books/', async (req, res) => {
     try {
         const data = req.body;
@@ -516,11 +494,16 @@ app.put('/selections/:id/:isbn', async (req, res) => {
 app.post('/storeorders/', async (req, res) => {
     try {
         console.log(req.body);
-        const { shippingaddress, courier, locationintransit, userid, cardnumber } = req.body;
+        const { shippingaddress, courier, locationintransit, userid,cardholdername,cardnumber,expirydate,securitycode} = req.body;
         const d = new Date();
         let dtime = d.toDateString();
+        cards = await pool.query("SELECT cardnumber FROM UserCards_GetByID($1)",[userid])
+        if ((cards.rows.length == 0)||!cards.rows.includes(cardnumber)){
+            newCard = await pool.query("SELECT * FROM UserCards_Register($1,$2,$3,$4,$5)",[userid,cardholdername,cardnumber,expirydate,securitycode])
+        }
         const order = await pool.query("SELECT * FROM StoreOrder_Register($1,$2,$3,$4,$5)",[shippingaddress,courier,locationintransit,dtime,userid,cardnumber]);
-        res.json(order.rows);
+        output = await parseJSON(order.rows)
+        res.json(output);
     } catch (err) {
         console.error(err.message);
     }

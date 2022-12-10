@@ -48,7 +48,7 @@ $$
     SELECT * FROM UserCards WHERE cardNumber = $1
 $$;
 
-CREATE OR REPLACE FUNCTION UserCards_GetByNumber(int)
+CREATE OR REPLACE FUNCTION UserCards_GetByID(int)
 returns setof UserCards
 language 'sql'
 AS 
