@@ -606,7 +606,8 @@ app.get('/reports/', async(req,res)=>{
         console.log(booksOrdered);
         
         let sales = 0;
-        let expenditures = 0;
+        let expenditures = 0; // note we should include bank accout number to all publishers
+        let salesPerPublisher = {};
         let salesPerGenre = {};
         let salesPerAuthor = {};
         for (let book of booksOrdered.rows) {
@@ -631,19 +632,44 @@ app.get('/reports/', async(req,res)=>{
 
                 salesPerAuthor[author] = salesPerAuthor[author] ? salesPerAuthor[author] + book.price * book.quantity : book.price * book.quantity;
             }
+
+            salesPerPublisher[book.publisherid] = salesPerPublisher[book.publisherid] ? salesPerPublisher[book.publisherid] + book.price * book.quantity * book.commission : book.price * book.quantity * book.commission ;
+            salesPerPublisher[book.publisherid] = salesPerPublisher[book.publisherid].toFixed(2);
         }
 
         // round values
         sales = sales.toFixed(2);
         expenditures = expenditures.toFixed(2);
 
+
+        let finalSalesPerAuthor = [];
+        // attach author info and publisher info to objects
+        for (const [key, value] of Object.entries(salesPerAuthor)) {
+            const currAuthor = await pool.query("SELECT * FROM author WHERE authorid = " + key);
+            let author = currAuthor.rows[0];
+            finalSalesPerAuthor.push({
+                author,
+                sales: value
+            })
+        }
+
+        let finalSalesPerPublisher = [];
+        for (const [key, value] of Object.entries(salesPerPublisher)) {
+            const currPublisher = await pool.query("SELECT * FROM publisher WHERE publisherid = " + key);
+            let publisher = currPublisher.rows[0];
+            finalSalesPerPublisher.push({
+                publisher,
+                sales: value
+            });
+        }
+
         
-        console.log(sales, expenditures, salesPerGenre, salesPerAuthor);
         res.json({
             sales: sales,
             expenditures: expenditures,
             salesPerGenre: salesPerGenre,
-            salesPerAuthor: salesPerAuthor
+            salesPerAuthor: finalSalesPerAuthor,
+            salesPerPublisher: finalSalesPerPublisher
         });
 
     } catch (err) {
