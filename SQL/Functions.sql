@@ -32,6 +32,23 @@ $$
     DELETE FROM StoreUser where userID=$1 RETURNING *;
 $$;
 
+CREATE OR REPLACE FUNCTION UserCards_Register(int,varchar,varchar,timestamp,int)
+returns setof UserCards
+language 'sql'
+AS
+$$
+    INSERT INTO UserCards (userID,cardHolderName,cardNumber,expiryDate,securityCode) VALUES ($1,$2,$3,$4,$5) RETURNING *;
+$$;
+
+CREATE OR REPLACE FUNCTION StoreUser_GetByNumber(varchar)
+returns setof UserCards
+language 'sql'
+AS 
+$$
+    SELECT * FROM UserCards WHERE cardNumber = $1
+$$;
+
+
 CREATE OR REPLACE FUNCTION Publisher_GetByID(int)
 returns setof Publisher
 language 'sql'

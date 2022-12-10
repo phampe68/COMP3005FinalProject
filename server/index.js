@@ -136,6 +136,24 @@ app.delete('/users/:id', async(req,res)=>{
 }
 );
 
+
+app.post('/usercards', async(req,res)=>{
+    try {
+        //should include userID,cardHolderName,cardNumber,expiryDate,securityCode
+        const {userID,cardHolderName,cardNumber,expiryDate,securityCode}=req.body;
+        console.log(req.body);
+        const newUser = await pool.query("SELECT * FROM UserCards_Register($1,$2,$3,$4,$5)",[userID,cardHolderName,cardNumber,expiryDate,securityCode]);
+        console.log(newUser.rows)
+        
+        res.json(parseJSON(newUser.rows));
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+);
+
+
+
 /*
 
 register a book
@@ -281,13 +299,15 @@ app.get('/publishers', async(req, res) => {
     }
 });
 
+
+
 //register a publisher
 app.post('/publishers', async(req,res)=>{
     try {
         //should include name, address, email, phoneNumber
-        const {name,address,email,phoneNumber,bankaccountnumber}=req.body;
+        const {name,address,email,phonenumber,bankaccountnumber}=req.body;
         console.log(req.body);
-        const newPublisher = await pool.query("SELECT * FROM Publisher_Register($1,$2,$3,$4,$5)",[name,address,email,phoneNumber,bankaccountnumber]);
+        const newPublisher = await pool.query("SELECT * FROM Publisher_Register($1,$2,$3,$4,$5)",[name,address,email,phonenumber,bankaccountnumber]);
         console.log(newPublisher.rows);
         res.json(newPublisher.rows[0]);
     } catch (err) {
