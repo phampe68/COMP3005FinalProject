@@ -487,7 +487,7 @@ app.post('/storeorders/', async(req,res)=>{
         const {shippingaddress,courier,locationintransit,userid,cardnumber}=req.body;
         const d = new Date();
         let dtime = d.toDateString();
-        const order = await pool.query("SELECT * FROM StoreOrder_Register($1,$2,$3,$4,$5)",[shippingaddress,courier,locationintransit,dtime,userid]);
+        const order = await pool.query("SELECT * FROM StoreOrder_Register($1,$2,$3,$4,$5)",[shippingaddress,courier,locationintransit,dtime,userid,cardnumber]);
         res.json(order.rows);
     } catch (err) {
         console.error(err.message);
