@@ -43,7 +43,7 @@ app.use(express.json()); // gives access to request.body to get json data
 async function parseJSON(j){
     
     for (let i in j){
-        console.log("ji: ",j[i])
+        //console.log("ji: ",j[i])
         if((typeof j[i].userid !=="undefined")&&(typeof j[i].fname=="undefined")){
             const user = await pool.query("SELECT * FROM StoreUser_GetByID($1)",[j[i].userid]);
             j[i].user = user.rows[0]
@@ -52,8 +52,8 @@ async function parseJSON(j){
             const author = await pool.query("SELECT * FROM Author_GetByID($1)",[j[i].authorid]);
             j[i].author = author.rows[0]
         }
-        console.log(j[i].isbn)
-        console.log(j[i].name)
+        //console.log(j[i].isbn)
+        //console.log(j[i].name)
         if((typeof j[i].isbn !=="undefined")&&(typeof j[i].name=="undefined")){
             const book = await pool.query("SELECT * FROM Book_GetByID($1)",[j[i].isbn]);
             j[i].book = book.rows[0]
@@ -66,10 +66,10 @@ async function parseJSON(j){
             const order = await pool.query("SELECT * FROM StoreOrder_GetByID($1)",[j[i].orderid]);
             j[i].order = order.rows[0]
         }
-        console.log(j[i])
+        //console.log(j[i])
         
     }
-    console.log("j:",j)
+    //console.log("j:",j)
     return j;
     
 }
@@ -248,6 +248,29 @@ app.put('/books/:id', async(req,res)=>{
         console.error(err.message);
     }
 });
+
+app.put('/books/', async(req,res)=>{
+    try {
+        const data=req.body;
+        let books=[]
+        const keys = Object.keys(data);
+        
+        for (let [key,value] of Object.entries(keys)){
+            let book = await pool.query("SELECT * FROM Book_UpdateStock($1,$2)",[key,value]);
+            console.log(key,value)
+            console.log("book rows: ",book)
+            books.push(book.rows)
+        }
+        
+        let output = await parseJSON(books);
+        console.log(books)
+        res.json(output);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+
 
 app.get('/publishers', async(req, res) => {
     try {

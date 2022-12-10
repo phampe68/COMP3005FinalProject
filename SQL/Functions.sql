@@ -129,7 +129,7 @@ returns setof Book
 language 'sql'
 AS
 $$
-    UPDATE Book SET stock=$2 where isbn=$1 RETURNING *;
+    UPDATE Book SET stock=stock+$2 where isbn=$1 RETURNING *;
 $$;
 
 CREATE OR REPLACE FUNCTION BookAuthors_AddAuthor(int,int)
