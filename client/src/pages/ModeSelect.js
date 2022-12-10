@@ -45,7 +45,7 @@ function ModeSelect() {
             lName: lName,
             address: address,
             email: email,
-            phoneNumber, phoneNumber
+            phoneNumber
         })
             .then(function (response) {
                 // reload users

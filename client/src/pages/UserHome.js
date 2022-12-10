@@ -18,33 +18,6 @@ import axios from 'axios';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import CartCard from "../components/cartCard";
 
-const myOrders = [
-    {
-        orderNumber: 1,
-        shippingAddress: "100 example drive",
-        courier: "FEDEX",
-        deliveryStatus: "In transit",
-        locationInTransit: "Toronto",
-        time: "12/24/21"
-    },
-    {
-        orderNumber: 1,
-        shippingAddress: "100 example drive",
-        courier: "FEDEX",
-        deliveryStatus: "In transit",
-        locationInTransit: "Toronto",
-        time: "12/24/21"
-    },
-    {
-        orderNumber: 1,
-        shippingAddress: "100 example drive",
-        courier: "FEDEX",
-        deliveryStatus: "In transit",
-        locationInTransit: "Toronto",
-        time: "12/24/21"
-    },
-
-];
 
 
 /*
@@ -61,10 +34,14 @@ function UserHome() {
     const [booksFound, setBooksFound] = useState([]);
     const [cart, setCart] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
-
+    const [orders, setOrders] = useState([]);
     useEffect(() => {
         axios.get(`http://localhost:5000/books/`).then(res => {
             setBooksFound(res.data);
+        });
+
+        axios.get(`http://localhost:5000/storeorders/` + user).then(res => {
+            setOrders(res.data);
         });
 
         setUser(localStorage.getItem("user"));
@@ -251,7 +228,7 @@ function UserHome() {
             <div>
                 <h2> Orders </h2>
                 <Grid style={{ marginTop: "5px", width: "50%" }} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-                    {myOrders.map((order, index) => (
+                    {orders.map((order, index) => (
                         <Grid item xs={2} sm={4} md={4} key={index}>
                             <OrderCard order={order} />
                         </Grid>

@@ -23,22 +23,22 @@ function OrderCard(props) {
             <Card sx={{ minWidth: 275, borderColor: "primary.main" }}>
                 <CardContent>
                     <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                        {"Order number: " + props.order.orderNumber}
+                        {"Order number: " + props.order.ordernumber}
                     </Typography>
                     <Typography variant="h5" component="div">
-                        {props.order.shippingAddress}
+                        {props.order.shippingaddress}
                     </Typography>
                     <Typography variant="body" component="div">
                         {props.order.courier}
                     </Typography>
                     <Typography variant="body" component="div">
-                        {props.order.deliveryStatus}
+                        {"Delivery status: " + props.order.deliverystatus}
                     </Typography>
                     <Typography variant="body" component="div">
-                        {props.order.locationInTransit}
+                        {props.order.locationintransit}
                     </Typography>
                     <Typography variant="body" component="div">
-                        {props.order.time}
+                        {props.order.dtime}
                     </Typography>
                     
                     
