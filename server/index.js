@@ -506,15 +506,10 @@ app.delete('/selections/:id/:isbn', async (req, res) => {
 app.post('/storeorders/', async (req, res) => {
     try {
         console.log(req.body);
-        const { shippingaddress,userid,cardholdername,cardnumber,expirydate,securitycode} = req.body;
+        const { shippingaddress,userid,cardnumber} = req.body;
         const d = new Date();
         let dtime = d.toDateString();
-        cards = await pool.query("SELECT cardnumber FROM UserCards_GetByID($1)",[userid])
-        if ((cards.rows.length == 0)||!cards.rows.includes(cardnumber)){
-            newCard = await pool.query("SELECT * FROM UserCards_Register($1,$2,$3,$4,$5)",[userid,cardholdername,cardnumber,expirydate,securitycode])
-        }
         const order = await pool.query("SELECT * FROM StoreOrder_Register($1,$2,$3,$4)",[shippingaddress,dtime,userid,cardnumber]);
-        
         output = await parseJSON(order.rows)
         res.json(output);
     } catch (err) {

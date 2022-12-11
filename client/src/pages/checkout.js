@@ -72,9 +72,9 @@ function Checkout() {
     const completeOrder = () => {
      
         axios.post("http://localhost:5000/storeorders", {
-            address, 
-            cardNumber: currCard,
-            userID
+            shippingaddress: address, 
+            cardnumber: currCard,
+            userid: userID
         }).then(res => {
             alert("Order placed!");
             navigate("/userHome");
