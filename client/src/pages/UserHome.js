@@ -73,11 +73,11 @@ function UserHome() {
     const executeSearch = () => {
         if (!searchBy) return;
         // TODO: make search query with genres and search field value
-        searchField = searchField.replace(" ", "+");
-        let query = searchBy + "=" + searchField
+        let newSearchField = searchField.replaceAll(" ", "+");
+        let query = searchBy + "=" + searchField;
         alert("executing search for: " + query);
 
-        axios.get(`http://localhost:5000/books/` + query).then(res => {
+        axios.get(`http://localhost:5000/books?` + query).then(res => {
             setBooksFound(res.data);
         });
 
@@ -198,8 +198,8 @@ function UserHome() {
                         >
                             <FormControlLabel value="ISBN" control={<Radio />} label="ISBN" />
                             <FormControlLabel value="name" control={<Radio />} label="name" />
-                            <FormControlLabel value="author" control={<Radio />} label="author name" />
-                            <FormControlLabel value="publisher" control={<Radio />} label="publisher name" />
+                            <FormControlLabel value="author.fname" control={<Radio />} label="author name" />
+                            <FormControlLabel value="publisher.name" control={<Radio />} label="publisher name" />
 
                         </RadioGroup>
                     </FormControl>

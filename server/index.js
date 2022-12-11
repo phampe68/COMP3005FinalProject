@@ -11,7 +11,7 @@ app.use(express.json()); // gives access to request.body to get json data
 
 
 function convertQueryToSQL(query) {
-    let sql = 'SELECT * FROM book';
+    let sql = 'SELECT * FROM book, author, publisher';
   
     // Check if there are any search criteria in the query
     if (Object.keys(query).length > 0) {
@@ -226,7 +226,7 @@ app.post('/books', async (req, res) => {
 //get all books
 app.get("/books?", async (req, res) => {
     const query = req.query;
-
+    console.log("HERE", query);
     try {
         let output = []
 
