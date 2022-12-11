@@ -194,8 +194,9 @@ exampleBookPost=
 app.post('/books', async (req, res) => {
     try {
         //should include name, numberOfPages, price, commission, stock, publisherID
-        const { name, numberofpages, price, commission, stock, publisherID, genres, authors } = req.body;
-        const newBook = await pool.query("SELECT * FROM Book_Register($1,$2,$3,$4,$5,$6)", [name, numberofpages, price, commission, stock, publisherID]);
+        const { name, numberofpages, price, commission, stock, publisherid, genres, authors } = req.body;
+        
+        const newBook = await pool.query("SELECT * FROM Book_Register($1,$2,$3,$4,$5,$6)", [name, numberofpages, price, commission, stock, publisherid]);
         let newBookGenre = [];
         let newBookAuthor = [];
         for (let i = 0; i < genres.length; i++) {
