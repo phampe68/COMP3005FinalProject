@@ -12,12 +12,12 @@ app.use(express.json()); // gives access to request.body to get json data
 
 
 function convertQueryToSQL(query) {
-    let sql = 'SELECT * FROM ((book natural join bookauthors) natural join author) natural join publisher';
+    let sql = 'SELECT * FROM (SELECT name as bookname, isbn, publisherid, authorid, price, stock FROM ((book natural join bookauthors))) AS x, author, publisher WHERE x.publisherid = publisher.publisherid AND author.authorid = x.authorid';
   
     // Check if there are any search criteria in the query
     if (Object.keys(query).length > 0) {
       // Add the WHERE clause to the SQL statement
-      sql += ' WHERE';
+      sql += ' AND';
   
       // Loop through each search criterion in the query
       Object.keys(query).forEach((key, index) => {
@@ -234,6 +234,7 @@ app.get("/books?", async (req, res) => {
         let myQuery = Object.keys(req.query).length === 0 ? "SELECT * FROM Book_GetALL()" : convertQueryToSQL(req.query);
         let allBooks = await pool.query(myQuery);
 
+        console.log("QUERY IS: ", myQuery);
         for (let i in allBooks.rows) {
             book = await parseJSON([allBooks.rows[i]])
             genres = await pool.query("SELECT genre FROM BookGenres_GetByBook($1)", [allBooks.rows[i].isbn]);

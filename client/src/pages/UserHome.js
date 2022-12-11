@@ -78,6 +78,7 @@ function UserHome() {
         alert("executing search for: " + query);
 
         axios.get(`http://localhost:5000/books?` + query).then(res => {
+            console.log(res.data);
             setBooksFound(res.data);
         });
 
@@ -131,7 +132,7 @@ function UserHome() {
                         {"ISBN: " + book.isbn}
                     </Typography>
                     <Typography variant="h5" component="div">
-                        {book.name}
+                        {book.bookname ? book.bookname: book.name}
                     </Typography>
                     <Typography variant="body" component="div">
                         {"Publisher: " + book.publisher.name}
@@ -197,7 +198,7 @@ function UserHome() {
                             onChange={(e) => setSearchBy(e.target.value)}
                         >
                             <FormControlLabel value="ISBN" control={<Radio />} label="ISBN" />
-                            <FormControlLabel value="name" control={<Radio />} label="name" />
+                            <FormControlLabel value="bookname" control={<Radio />} label="name" />
                             <FormControlLabel value="author.fname" control={<Radio />} label="author first name" />
                             <FormControlLabel value="publisher.name" control={<Radio />} label="publisher name" />
 

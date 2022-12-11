@@ -98,8 +98,7 @@ function Checkout() {
                             </Grid>
                         )) : null}
                     </Grid>
-                    <h2>Total Price ${totalPrice}</h2>
-                </div>
+=                </div>
                 <h2>Add Billing and Shipping Information:</h2>
                 <div style={{ marginBottom: "2%" }}>
                     <TextField onChange={(e) => setAddress(e.target.value)} id="txtAddress" label="Enter Address" variant="outlined" width sx={{ width: 300, marginRight: 4 }} />
