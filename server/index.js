@@ -10,6 +10,30 @@ app.use(cors());
 app.use(express.json()); // gives access to request.body to get json data
 
 
+function convertQueryToSQL(query) {
+    let sql = 'SELECT * FROM book';
+  
+    // Check if there are any search criteria in the query
+    if (Object.keys(query).length > 0) {
+      // Add the WHERE clause to the SQL statement
+      sql += ' WHERE';
+  
+      // Loop through each search criterion in the query
+      Object.keys(query).forEach((key, index) => {
+        // Add the field name and value to the WHERE clause
+        sql += ` ${key} = '${query[key]}'`;
+  
+        // If this is not the last criterion, add the AND keyword
+        if (index < Object.keys(query).length - 1) {
+          sql += ' AND';
+        }
+      });
+    }
+  
+    // Return the generated SQL statement
+    return sql;
+  }
+
 /*
     FUNCTION NAME: parseJSON(j)
     ARGUMENTS: j, which is a list of json objects that contain ids.
@@ -195,11 +219,28 @@ app.post('/books', async (req, res) => {
 }
 );
 
+
+
+
 //get all books
-app.get("/books", async (req, res) => {
+app.get("/books?", async (req, res) => {
+    const query = req.query;
+
     try {
         let output = []
-        const allBooks = await pool.query("SELECT * FROM Book_GetALL()");
+
+    
+        let allBooks;
+        if (req.query) {
+            let sqlQuery = convertQueryToSQL(req.query);
+            console.log("A", sqlQuery);
+
+            allBooks = await pool.query(sqlQuery);
+        } else {
+            allBooks = await pool.query("SELECT * FROM Book_GetALL()");
+
+        }
+
         for (let i in allBooks.rows) {
             book = await parseJSON([allBooks.rows[i]])
             genres = await pool.query("SELECT genre FROM BookGenres_GetByBook($1)", [allBooks.rows[i].isbn]);
@@ -211,6 +252,9 @@ app.get("/books", async (req, res) => {
         console.error(err.message);
     }
 });
+
+
+  
 
 //get a book by isbn
 app.get('/books/:id', async (req, res) => {

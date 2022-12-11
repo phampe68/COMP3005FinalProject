@@ -52,6 +52,10 @@ function AdminHome() {
         axios.get(`http://localhost:5000/reports`).then(res => {
             setReportData(res.data);
         });
+
+        axios.get(`http://localhost:5000/publishers/`).then(res => {
+            setPublihsersList(res.data);
+        });
     }, []);
 
     const [bookOrders, setBookOrders] = useState(() => {
@@ -89,15 +93,15 @@ function AdminHome() {
         }
 
         // only add book if all fields are full
-        if (!name || !numberOfPages || !price || !commission || !stock || !publisherID || !authors || authorIDsToAdd.length === 0 || !publisherBankAccountNumber) return;
+        if (!name || !numberOfPages || !price || !commission || !stock || !publisherID || !authors || authorIDsToAdd.length === 0) return;
 
         axios.post('http://localhost:5000/books', {
             name: name,
-            numberOfPages: numberOfPages,
+            numberofpages: numberOfPages,
             price: price,
             commission: commission,
             stock: stock,
-            publisherID: publisherID,
+            publisherid: publisherID,
             genres: genres,
             authors: authorIDsToAdd
         })
@@ -143,7 +147,8 @@ function AdminHome() {
             name: publisherName,
             address: publisherAddress,
             email: publisherEmail,
-            phoneNumber: publisherPhoneNumber
+            phonenumber: publisherPhoneNumber,
+            bankaccountnumber: publisherBankAccountNumber
         })
             .then(() => {
                 setPublisherName("");

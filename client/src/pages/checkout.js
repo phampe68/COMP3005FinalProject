@@ -5,6 +5,7 @@ import axios from 'axios';
 import CartCard from "../components/cartCard";
 import Grid from '@mui/material/Grid';
 import Autocomplete from '@mui/material/Autocomplete';
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -12,8 +13,8 @@ import Autocomplete from '@mui/material/Autocomplete';
 Page that lets you search books and shows a bunch of books 
 */
 function Checkout() {
-    let cardList = [];
-    //TODO: make a query here to get cart and calculate total
+    let navigate = useNavigate();
+
     let total = 0;
     const [cart, setCart] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
@@ -69,7 +70,16 @@ function Checkout() {
         });
     }
     const completeOrder = () => {
+     
+        axios.post("http://localhost:5000/storeorders", {
+            address, 
+            cardNumber: currCard,
+            userID
+        }).then(res => {
+            alert("Order placed!");
+            navigate("/userHome");
 
+        })
     }
 
     return (

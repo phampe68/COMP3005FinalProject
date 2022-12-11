@@ -73,8 +73,14 @@ function UserHome() {
     const executeSearch = () => {
         if (!searchBy) return;
         // TODO: make search query with genres and search field value
+        searchField = searchField.replace(" ", "+");
         let query = searchBy + "=" + searchField
         alert("executing search for: " + query);
+
+        axios.get(`http://localhost:5000/books/` + query).then(res => {
+            setBooksFound(res.data);
+        });
+
     }
 
     const BookCard = (props) => {
