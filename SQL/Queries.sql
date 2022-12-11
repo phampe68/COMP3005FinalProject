@@ -1,0 +1,1 @@
+--All the queries are in Functions.sql, so this file is redundant. Thanks for grading this assignment, btw.

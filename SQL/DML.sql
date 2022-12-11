@@ -22,7 +22,7 @@ ALTER SEQUENCE storeuser_userid_seq RESTART;
 
 --storeuser
 INSERT INTO STOREUSER (userID,fName,lName,address,email,phoneNumber) values (0,'Test','User 1','123 Example Street','user1@gmail.com','(123)-456-7890'), 
-(2,'Test','User 2','124 Example Street','user2@gmail.com','(123)-456-7891');
+(1,'Test','User 2','124 Example Street','user2@gmail.com','(123)-456-7891');
 
 --usercard
 INSERT INTO UserCards (userID,cardHolderName,cardNumber,expiryDate,securityCode) values (0,'Test User 1','1234567890','2024-11-10',123);
@@ -45,8 +45,10 @@ INSERT INTO bookgenres (genre,isbn) values ('Fantastical',0);
 --userbookselections
 INSERT INTO userbookselections (userID,isbn,quantity) values (0,0,3);
 
+--userbookselections
+INSERT INTO userbookselections (userID,isbn,quantity) values (1,0,3);
+
 --storeorder
 INSERT INTO storeorder (orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID,cardNumber) values (0,'321 Avenue Street','Courier Courier Services',false,'Warehouse','2022-12-12',0,'1234567890');
 
---bookorder
-INSERT INTO bookorders (orderNumber,isbn,quantity) values (0,0,2);
+

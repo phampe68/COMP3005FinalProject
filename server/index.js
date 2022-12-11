@@ -461,14 +461,15 @@ app.delete('/selections/:id/:isbn', async (req, res) => {
 app.post('/storeorders/', async (req, res) => {
     try {
         console.log(req.body);
-        const { shippingaddress, courier, locationintransit, userid,cardholdername,cardnumber,expirydate,securitycode} = req.body;
+        const { shippingaddress,userid,cardholdername,cardnumber,expirydate,securitycode} = req.body;
         const d = new Date();
         let dtime = d.toDateString();
         cards = await pool.query("SELECT cardnumber FROM UserCards_GetByID($1)",[userid])
         if ((cards.rows.length == 0)||!cards.rows.includes(cardnumber)){
             newCard = await pool.query("SELECT * FROM UserCards_Register($1,$2,$3,$4,$5)",[userid,cardholdername,cardnumber,expirydate,securitycode])
         }
-        const order = await pool.query("SELECT * FROM StoreOrder_Register($1,$2,$3,$4,$5)",[shippingaddress,courier,locationintransit,dtime,userid,cardnumber]);
+        const order = await pool.query("SELECT * FROM StoreOrder_Register($1,$2,$3,$4)",[shippingaddress,dtime,userid,cardnumber]);
+        
         output = await parseJSON(order.rows)
         res.json(output);
     } catch (err) {
@@ -528,11 +529,14 @@ app.delete('/storeorders/:id', async (req, res) => {
 }
 );
 
+//deprecated
 //add book to order
 app.post('/bookorders/', async (req, res) => {
     try {
         const { orderId, isbn, quantity } = req.body;
         const bookorder = await pool.query("SELECT * FROM BookOrder_Post($1,$2,$3)", [orderId, isbn, quantity]);
+        book = await pool.query("SELECT * FROM Book_UpdateStock($1,$2)"[isbn,-quantity]);
+        console.log(book.rows)
         res.json(bookorder.rows);
     } catch (err) {
         console.error(err.message);
@@ -543,22 +547,20 @@ app.post('/bookorders/', async (req, res) => {
 //get all orders
 app.get('/bookorders/', async (req, res) => {
     try {
-        console.log(req.body);
-        const { orderId, isbn, quantity } = req.body;
-        const bookorder = await pool.query("SELECT * FROM BookOrder_GetByOrder($1,$2,$3)", [orderId]);
-        res.json(bookorder.rows);
+        const bookorders = await pool.query("SELECT * FROM BookOrders_GetAll()");
+        res.json(bookorders.rows);
     } catch (err) {
         console.error(err.message);
     }
 }
 );
 
-//remove order from bookorders
-app.delete('/bookorders/:id', async (req, res) => {
+//get books from bookorders by order id
+app.get('/bookorders/:id', async (req, res) => {
     try {
         console.log(req.params);
         const { orderID } = req.params;
-        const order = await pool.query("SELECT * FROM BookOrder_Delete($1)", [orderID]);
+        const order = await pool.query("SELECT * FROM BookOrder_GetByOrder($1)", [orderID]);
         res.json(order.rows);
     } catch (err) {
         console.error(err.message);

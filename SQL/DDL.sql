@@ -112,4 +112,5 @@ CREATE TABLE UserBookSelections(
 );
 
 \i SQL/Functions.sql
+\i SQL/Triggers.sql
 \i SQL/DML.sql
