@@ -228,20 +228,11 @@ app.post('/books', async (req, res) => {
 app.get("/books?", async (req, res) => {
     const query = req.query;
     console.log("HERE", query);
+
     try {
-        let output = []
-
-    
-        let allBooks;
-        if (req.query) {
-            let sqlQuery = convertQueryToSQL(req.query);
-            console.log("A", sqlQuery);
-
-            allBooks = await pool.query(sqlQuery);
-        } else {
-            allBooks = await pool.query("SELECT * FROM Book_GetALL()");
-
-        }
+        let output = []  
+        let myQuery = Object.keys(req.query).length === 0 ? "SELECT * FROM Book_GetALL()" : convertQueryToSQL(req.query);
+        let allBooks = await pool.query(myQuery);
 
         for (let i in allBooks.rows) {
             book = await parseJSON([allBooks.rows[i]])

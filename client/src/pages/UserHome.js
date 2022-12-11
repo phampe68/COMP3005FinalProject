@@ -40,7 +40,7 @@ function UserHome() {
             setBooksFound(res.data);
         });
 
-        axios.get(`http://localhost:5000/storeorders/` + user).then(res => {
+        axios.get(`http://localhost:5000/storeorders/user/` + user).then(res => {
             setOrders(res.data);
         });
 
