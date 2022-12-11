@@ -67,7 +67,7 @@ $$;
 
 -- PURPOSE:         get cards by userid
 -- ARGUMENTS:       userid
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing all the cards and their info of a user
 CREATE OR REPLACE FUNCTION UserCards_GetByID(int)
 returns setof UserCards
 language 'sql'
@@ -76,9 +76,9 @@ $$
     SELECT * FROM UserCards WHERE userID = $1
 $$;
 
--- PURPOSE:         
+-- PURPOSE:         gets a publisher by publisherid
 -- ARGUMENTS:       publisherid
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing a single publisher
 CREATE OR REPLACE FUNCTION Publisher_GetByID(int)
 returns setof Publisher
 language 'sql'
@@ -87,9 +87,9 @@ $$
     SELECT * FROM Publisher WHERE PublisherID = $1
 $$;
 
--- PURPOSE:         
+-- PURPOSE:         gets all publishers
 -- ARGUMENTS:       none
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing all publishers
 CREATE OR REPLACE FUNCTION Publisher_GetAll()
 returns setof Publisher
 language 'sql'
@@ -100,7 +100,7 @@ $$;
 
 -- PURPOSE:         Insert a user into the database
 -- ARGUMENTS:       name,address,email,phoneNumber,bankAccountNumber
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing the newly inserted publisher
 CREATE OR REPLACE FUNCTION Publisher_Register(varchar,varchar,varchar,varchar,varchar)
 returns setof Publisher
 language 'sql'
@@ -111,7 +111,7 @@ $$;
 
 -- PURPOSE:         Insert a user into the database
 -- ARGUMENTS:       fName,lName
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing the newly inserted author
 CREATE OR REPLACE FUNCTION Author_Register(varchar,varchar)
 returns setof Author
 language 'sql'
@@ -120,9 +120,9 @@ $$
     INSERT INTO Author (fName,lName) VALUES ($1,$2) RETURNING *;
 $$;
 
--- PURPOSE:         
+-- PURPOSE:         Gets all authors
 -- ARGUMENTS:       none
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing all authors
 CREATE OR REPLACE FUNCTION Author_GetAll()
 returns setof Author
 language 'sql'
@@ -131,9 +131,9 @@ $$
     SELECT * FROM Author;
 $$;
 
--- PURPOSE:         
+-- PURPOSE:         Gets an author by an authorid
 -- ARGUMENTS:       authorid
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing the found author
 CREATE OR REPLACE FUNCTION Author_GetByID(int)
 returns setof Author
 language 'sql'
@@ -142,9 +142,9 @@ $$
     SELECT * FROM Author WHERE authorID = $1
 $$;
 
--- PURPOSE:         
+-- PURPOSE:         Gets books by ISBN
 -- ARGUMENTS:       isbn
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing the found book 
 CREATE OR REPLACE FUNCTION Book_GetByID(int)
 returns setof Book
 language 'sql'
@@ -153,9 +153,9 @@ $$
     SELECT * FROM Book WHERE ISBN = $1
 $$;
 
--- PURPOSE:         
+-- PURPOSE:         Gets all books
 -- ARGUMENTS:       none
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing all books
 CREATE OR REPLACE FUNCTION Book_GetAll()
 returns setof Book
 language 'sql'
@@ -164,9 +164,9 @@ $$
     SELECT * FROM Book;
 $$;
 
--- PURPOSE:         Insert a user into the database
+-- PURPOSE:         Insert a book into the database
 -- ARGUMENTS:       name, numberOfPages, price, commission, stock, publisherID
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing the newly inserted book
 CREATE OR REPLACE FUNCTION Book_Register(varchar,int,numeric,numeric,int,int)
 returns setof Book
 language 'sql'
@@ -175,9 +175,9 @@ $$
     INSERT INTO Book (name, numberOfPages, price, commission, stock, publisherID) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;
 $$;
 
--- PURPOSE:         
+-- PURPOSE:         Gets all books that can be removed (books not currently selected or being ordered
 -- ARGUMENTS:       none
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing books eligible for removal
 CREATE OR REPLACE FUNCTION Book_GetRemovable()
 returns setof Book
 language 'sql'
@@ -186,9 +186,9 @@ $$
     SELECT * FROM Book WHERE Book.isbn not in (select isbn from BookOrders) and Book.isbn not in (select isbn from UserBookSelections)
 $$;
 
--- PURPOSE:         
+-- PURPOSE:         Removes a book by ISBN
 -- ARGUMENTS:       isbn
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing the removed book
 CREATE OR REPLACE FUNCTION Book_Remove(int)
 returns Boolean
 language 'sql'
@@ -202,7 +202,7 @@ $$;
 
 -- PURPOSE:         update the stock of a book
 -- ARGUMENTS:       isbn, stock
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing the updated book
 CREATE OR REPLACE FUNCTION Book_UpdateStock(int,int)
 returns setof Book
 language 'sql'
@@ -213,7 +213,7 @@ $$;
 
 -- PURPOSE:         pair an author with a book 
 -- ARGUMENTS:       isbn,authorid
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing the newly inserted bookauthor pair
 CREATE OR REPLACE FUNCTION BookAuthors_AddAuthor(int,int)
 returns setof BookAuthors
 language 'sql'
@@ -224,7 +224,7 @@ $$;
 
 -- PURPOSE:         get books written by an author
 -- ARGUMENTS:       authorid
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing all bookauthor rows with the given authorid 
 CREATE OR REPLACE FUNCTION BookAuthors_GetByAuthor(int)
 returns setof BookAuthors
 language 'sql'
@@ -235,7 +235,7 @@ $$;
 
 -- PURPOSE:         get authors of a book
 -- ARGUMENTS:       isbn
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing all bookauthor rows with the isbn
 CREATE OR REPLACE FUNCTION BookAuthors_GetByBook(int)
 returns setof BookAuthors
 language 'sql'
@@ -246,7 +246,7 @@ $$;
 
 -- PURPOSE:         add a genre to a book
 -- ARGUMENTS:       isbn,genre
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing the newly added book genre 
 CREATE OR REPLACE FUNCTION BookGenres_AddGenre(int,varchar)
 returns setof BookGenres
 language 'sql'
@@ -257,7 +257,7 @@ $$;
 
 -- PURPOSE:         get genres of a book
 -- ARGUMENTS:       isbn
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing all isbn genre pairs with the same isbn
 CREATE OR REPLACE FUNCTION BookGenres_GetByBook(int)
 returns setof BookGenres
 language 'sql'
@@ -268,7 +268,7 @@ $$;
 
 -- PURPOSE:         get books of a genre
 -- ARGUMENTS:       genre
--- RETURN VALUES:   a table containing 
+-- RETURN VALUES:   a table containing all isbn genre pairs with the same genre
 CREATE OR REPLACE FUNCTION BookGenres_GetByGenre(varchar)
 returns setof BookGenres
 language 'sql'
