@@ -204,7 +204,7 @@ $$
     SELECT * FROM BookGenres WHERE GENRE = $1
 $$;
 
-CREATE OR REPLACE FUNCTION StoreOrder_Register(varchar,varchar,varchar,timestamp,int,varchar)
+CREATE OR REPLACE FUNCTION StoreOrder_Register(varchar,timestamp,int,varchar)
 returns setof StoreOrder
 language 'sql'
 AS

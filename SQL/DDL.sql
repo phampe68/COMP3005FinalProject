@@ -111,6 +111,7 @@ CREATE TABLE UserBookSelections(
     FOREIGN KEY (isbn) references Book (isbn)
 );
 
---\i SQL/Functions.sql
---\i SQL/Triggers.sql
---\i SQL/DML.sql
+-- you can replace "SQL" with the path to each file, or just run init.sql, which has all of the sql statements included
+\i SQL/Functions.sql
+\i SQL/Triggers.sql
+\i SQL/DML.sql
