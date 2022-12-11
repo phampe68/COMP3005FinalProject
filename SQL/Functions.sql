@@ -1,5 +1,7 @@
 
--- 
+-- PURPOSE:         Get all information of a single user
+-- ARGUMENTS:       userid
+-- RETURN VALUES:   a table containing all attributes of single user
 CREATE OR REPLACE FUNCTION StoreUser_GetByID(int)
 returns setof StoreUser
 language 'sql'
@@ -8,6 +10,9 @@ $$
     SELECT * FROM StoreUser WHERE UserID = $1
 $$;
 
+-- PURPOSE:         Get all information of all users
+-- ARGUMENTS:       none
+-- RETURN VALUES:   a table containing all attributes of all users
 CREATE OR REPLACE FUNCTION StoreUser_GetAll()
 returns setof StoreUser
 language 'sql'
@@ -16,6 +21,9 @@ $$
     SELECT * FROM StoreUser;
 $$;
 
+-- PURPOSE:         Insert a user into the database
+-- ARGUMENTS:       fName,lName,address,email,phoneNumber
+-- RETURN VALUES:   a table containing all attributes of newly inserted user
 CREATE OR REPLACE FUNCTION StoreUser_Register(varchar,varchar,varchar,varchar,varchar)
 returns setof StoreUser
 language 'sql'
@@ -24,6 +32,9 @@ $$
     INSERT INTO STOREUSER (fName,lName,address,email,phoneNumber) VALUES ($1,$2,$3,$4,$5) RETURNING *;
 $$;
 
+-- PURPOSE:         deprecated, delete a user from the database
+-- ARGUMENTS:       userid
+-- RETURN VALUES:   a table containing all attributes of the deleted user
 CREATE OR REPLACE FUNCTION StoreUser_Delete(int)
 returns setof StoreUser
 language 'sql'
@@ -32,6 +43,9 @@ $$
     DELETE FROM StoreUser where userID=$1 RETURNING *;
 $$;
 
+-- PURPOSE:         Insert a card into the database
+-- ARGUMENTS:       userid, cardnumber, expirydate, securitycode
+-- RETURN VALUES:   a table containing all attributes of the new card
 CREATE OR REPLACE FUNCTION UserCards_Register(int,varchar,varchar,timestamp,int)
 returns setof UserCards
 language 'sql'
@@ -40,6 +54,9 @@ $$
     INSERT INTO UserCards (userID,cardHolderName,cardNumber,expiryDate,securityCode) VALUES ($1,$2,$3,$4,$5) RETURNING *;
 $$;
 
+-- PURPOSE:         get a card by its cardnumber
+-- ARGUMENTS:       cardnumber
+-- RETURN VALUES:   a table containing the card with corresponding cardnumber
 CREATE OR REPLACE FUNCTION UserCards_GetByNumber(varchar)
 returns setof UserCards
 language 'sql'
@@ -48,6 +65,9 @@ $$
     SELECT * FROM UserCards WHERE cardNumber = $1
 $$;
 
+-- PURPOSE:         get cards by userid
+-- ARGUMENTS:       userid
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION UserCards_GetByID(int)
 returns setof UserCards
 language 'sql'
@@ -56,6 +76,9 @@ $$
     SELECT * FROM UserCards WHERE userID = $1
 $$;
 
+-- PURPOSE:         
+-- ARGUMENTS:       publisherid
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Publisher_GetByID(int)
 returns setof Publisher
 language 'sql'
@@ -64,6 +87,9 @@ $$
     SELECT * FROM Publisher WHERE PublisherID = $1
 $$;
 
+-- PURPOSE:         
+-- ARGUMENTS:       none
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Publisher_GetAll()
 returns setof Publisher
 language 'sql'
@@ -72,6 +98,9 @@ $$
     SELECT * FROM Publisher;
 $$;
 
+-- PURPOSE:         Insert a user into the database
+-- ARGUMENTS:       name,address,email,phoneNumber,bankAccountNumber
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Publisher_Register(varchar,varchar,varchar,varchar,varchar)
 returns setof Publisher
 language 'sql'
@@ -80,6 +109,9 @@ $$
     INSERT INTO Publisher (name,address,email,phoneNumber,bankAccountNumber) VALUES ($1,$2,$3,$4,$5) RETURNING *;
 $$;
 
+-- PURPOSE:         Insert a user into the database
+-- ARGUMENTS:       fName,lName
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Author_Register(varchar,varchar)
 returns setof Author
 language 'sql'
@@ -88,6 +120,9 @@ $$
     INSERT INTO Author (fName,lName) VALUES ($1,$2) RETURNING *;
 $$;
 
+-- PURPOSE:         
+-- ARGUMENTS:       none
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Author_GetAll()
 returns setof Author
 language 'sql'
@@ -96,6 +131,9 @@ $$
     SELECT * FROM Author;
 $$;
 
+-- PURPOSE:         
+-- ARGUMENTS:       authorid
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Author_GetByID(int)
 returns setof Author
 language 'sql'
@@ -104,6 +142,9 @@ $$
     SELECT * FROM Author WHERE authorID = $1
 $$;
 
+-- PURPOSE:         
+-- ARGUMENTS:       isbn
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Book_GetByID(int)
 returns setof Book
 language 'sql'
@@ -112,6 +153,9 @@ $$
     SELECT * FROM Book WHERE ISBN = $1
 $$;
 
+-- PURPOSE:         
+-- ARGUMENTS:       none
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Book_GetAll()
 returns setof Book
 language 'sql'
@@ -120,6 +164,9 @@ $$
     SELECT * FROM Book;
 $$;
 
+-- PURPOSE:         Insert a user into the database
+-- ARGUMENTS:       name, numberOfPages, price, commission, stock, publisherID
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Book_Register(varchar,int,numeric,numeric,int,int)
 returns setof Book
 language 'sql'
@@ -128,6 +175,9 @@ $$
     INSERT INTO Book (name, numberOfPages, price, commission, stock, publisherID) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;
 $$;
 
+-- PURPOSE:         
+-- ARGUMENTS:       none
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Book_GetRemovable()
 returns setof Book
 language 'sql'
@@ -136,6 +186,9 @@ $$
     SELECT * FROM Book WHERE Book.isbn not in (select isbn from BookOrders) and Book.isbn not in (select isbn from UserBookSelections)
 $$;
 
+-- PURPOSE:         
+-- ARGUMENTS:       isbn
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Book_Remove(int)
 returns Boolean
 language 'sql'
@@ -147,7 +200,9 @@ $$
     SELECT NOT EXISTS (SELECT isbn from book where isbn=$1);
 $$;
 
-
+-- PURPOSE:         update the stock of a book
+-- ARGUMENTS:       isbn, stock
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION Book_UpdateStock(int,int)
 returns setof Book
 language 'sql'
@@ -156,6 +211,9 @@ $$
     UPDATE Book SET stock=stock+$2 where isbn=$1 RETURNING *;
 $$;
 
+-- PURPOSE:         pair an author with a book 
+-- ARGUMENTS:       isbn,authorid
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION BookAuthors_AddAuthor(int,int)
 returns setof BookAuthors
 language 'sql'
@@ -164,6 +222,9 @@ $$
     INSERT INTO BookAuthors (isbn, authorID) VALUES ($1,$2) RETURNING *;
 $$;
 
+-- PURPOSE:         get books written by an author
+-- ARGUMENTS:       authorid
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION BookAuthors_GetByAuthor(int)
 returns setof BookAuthors
 language 'sql'
@@ -172,6 +233,9 @@ $$
     SELECT * FROM BookAuthors WHERE authorID = $1
 $$;
 
+-- PURPOSE:         get authors of a book
+-- ARGUMENTS:       isbn
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION BookAuthors_GetByBook(int)
 returns setof BookAuthors
 language 'sql'
@@ -180,6 +244,9 @@ $$
     SELECT * FROM BookAuthors WHERE ISBN = $1
 $$;
 
+-- PURPOSE:         add a genre to a book
+-- ARGUMENTS:       isbn,genre
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION BookGenres_AddGenre(int,varchar)
 returns setof BookGenres
 language 'sql'
@@ -188,6 +255,9 @@ $$
     INSERT INTO BookGenres (isbn, genre) VALUES ($1,$2) RETURNING *;
 $$;
 
+-- PURPOSE:         get genres of a book
+-- ARGUMENTS:       isbn
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION BookGenres_GetByBook(int)
 returns setof BookGenres
 language 'sql'
@@ -196,6 +266,9 @@ $$
     SELECT * FROM BookGenres WHERE ISBN = $1
 $$;
 
+-- PURPOSE:         get books of a genre
+-- ARGUMENTS:       genre
+-- RETURN VALUES:   a table containing 
 CREATE OR REPLACE FUNCTION BookGenres_GetByGenre(varchar)
 returns setof BookGenres
 language 'sql'
@@ -204,6 +277,9 @@ $$
     SELECT * FROM BookGenres WHERE GENRE = $1
 $$;
 
+-- PURPOSE:         Insert an order into the database
+-- ARGUMENTS:       shippingAddress,dtime,userid,cardnumber
+-- RETURN VALUES:   a table containing all attributes of the new order
 CREATE OR REPLACE FUNCTION StoreOrder_Register(varchar,timestamp,int,varchar)
 returns setof StoreOrder
 language 'sql'
@@ -212,6 +288,9 @@ $$
     INSERT INTO StoreOrder (shippingaddress,courier,deliverystatus,locationintransit,dtime,userid,cardnumber) VALUES ($1,'Random Courier Company',False,'123 Warehouse Street',$2,$3,$4) RETURNING *;
 $$;
 
+-- PURPOSE:         get all orders
+-- ARGUMENTS:       none
+-- RETURN VALUES:   a table containing all columns of all orders
 CREATE OR REPLACE FUNCTION StoreOrder_GetAll()
 returns setof StoreOrder
 language 'sql'
@@ -220,6 +299,9 @@ $$
     SELECT * FROM StoreOrder
 $$;
 
+-- PURPOSE:         get an order by ordernumber
+-- ARGUMENTS:       ordernumber
+-- RETURN VALUES:   a table containing all columns associated with ordernumber
 CREATE OR REPLACE FUNCTION StoreOrder_GetByID(int)
 returns setof StoreOrder
 language 'sql'
@@ -228,6 +310,9 @@ $$
     SELECT * FROM StoreOrder WHERE orderNumber = $1
 $$;
 
+-- PURPOSE:         get all orders placed by a user
+-- ARGUMENTS:       userid
+-- RETURN VALUES:   a table containing all columns of orders corresponding to user
 CREATE OR REPLACE FUNCTION StoreOrder_GetByUser(int)
 returns setof StoreOrder
 language 'sql'
@@ -236,7 +321,9 @@ $$
     SELECT * FROM StoreOrder WHERE userID = $1
 $$;
 
-
+-- PURPOSE:         pair an order with a book along with the quantity in the order
+-- ARGUMENTS:       ordernumber,isbn,quantity
+-- RETURN VALUES:   a table containing all columns of the new bookorder
 CREATE OR REPLACE FUNCTION BookOrders_Register(int,int,int)
 returns setof BookOrders
 language 'sql'
@@ -245,6 +332,9 @@ $$
     INSERT INTO BookOrders (orderNumber,isbn,quantity) VALUES ($1,$2,$3) RETURNING *;
 $$;
 
+-- PURPOSE:         deprecated, remove an order from the database
+-- ARGUMENTS:       ordernumber
+-- RETURN VALUES:   a table containing deleted bookorders
 CREATE OR REPLACE FUNCTION BookOrders_Remove(int)
 returns setof BookOrders
 language 'sql'
@@ -253,6 +343,9 @@ $$
     DELETE FROM BookOrders where orderNumber=$1 RETURNING *;
 $$;
 
+-- PURPOSE:         get all ordernumbers and isbns with their quantity
+-- ARGUMENTS:       none
+-- RETURN VALUES:   a table containing all columns corresponding to matching isbn that have been ordered
 CREATE OR REPLACE FUNCTION BookOrders_GetAll()
 returns setof BookOrders
 language 'sql'
@@ -261,6 +354,9 @@ $$
     SELECT * FROM BookOrders
 $$;
 
+-- PURPOSE:         get all orders containing isbn
+-- ARGUMENTS:       isbn
+-- RETURN VALUES:   a table containing all columns associated with the isbn
 CREATE OR REPLACE FUNCTION BookOrders_GetByBook(int)
 returns setof BookOrders
 language 'sql'
@@ -269,6 +365,9 @@ $$
     SELECT * FROM BookOrders WHERE isbn = $1
 $$;
 
+-- PURPOSE:         get order corresponding to ordernumber
+-- ARGUMENTS:       ordernumber
+-- RETURN VALUES:   a table containing the columns of the order with ordernumber
 CREATE OR REPLACE FUNCTION BookOrders_GetByOrder(int)
 returns setof BookOrders
 language 'sql'
@@ -277,6 +376,9 @@ $$
     SELECT * FROM BookOrders WHERE orderNumber = $1
 $$;
 
+-- PURPOSE:         Add a book with quantity to user's cart. 
+-- ARGUMENTS:       userid,isbn,quantity
+-- RETURN VALUES:   a table containing the columns of the new cart item
 CREATE OR REPLACE FUNCTION UserBookSelections_AddBook(int,int,int)
 returns setof UserBookSelections
 language 'sql'
@@ -285,6 +387,9 @@ $$
     INSERT INTO UserBookSelections (userID, ISBN, quantity) VALUES ($1,$2,$3) RETURNING *;
 $$;
 
+-- PURPOSE:         Adds addQuantity to the quantity associated with userid,isbn 
+-- ARGUMENTS:       userid,isbn,addquantity
+-- RETURN VALUES:   a table containing the columns of the updated cart item
 CREATE OR REPLACE FUNCTION UserBookSelections_AddQuantity(int,int,int)
 returns setof UserBookSelections
 language 'sql'
@@ -293,6 +398,9 @@ $$
     Update UserBookSelections set quantity=quantity+$3 where userID=$1 and isbn=$2 RETURNING *;
 $$;
 
+-- PURPOSE:         deprecated, subtracts subQuantity from quantity corresponding to userid,isbn
+-- ARGUMENTS:       userid,isbn,subQuantity
+-- RETURN VALUES:   a table containing the columns of the updated cart item
 CREATE OR REPLACE FUNCTION UserBookSelections_SubQuantity(int,int,int)
 returns setof UserBookSelections
 language 'sql'
@@ -301,6 +409,9 @@ $$
     Update UserBookSelections set quantity=quantity-$3 where userID=$1 and isbn=$2 RETURNING *;
 $$;
 
+-- PURPOSE:         delete item from a user's cart
+-- ARGUMENTS:       userid,isbn
+-- RETURN VALUES:   a table containing all columns of ids of the deleted cart item
 CREATE OR REPLACE FUNCTION UserBookSelections_Delete(int, int)
 returns setof UserBookSelections
 language 'sql'
@@ -309,6 +420,9 @@ $$
     DELETE FROM UserBookSelections where userID=$1 and isbn=$2 RETURNING *;
 $$;
 
+-- PURPOSE:         get the cart associated with a user
+-- ARGUMENTS:       userid
+-- RETURN VALUES:   a table containing all columns of ids in cart associated with the user
 CREATE OR REPLACE FUNCTION UserBookSelections_GetByID(int)
 returns setof UserBookSelections
 language 'sql'
@@ -317,6 +431,9 @@ $$
     SELECT * FROM UserBookSelections WHERE userID = $1
 $$;
 
+-- PURPOSE:         get all carts of all users
+-- ARGUMENTS:       none
+-- RETURN VALUES:   a table containing all columns of all carts
 CREATE OR REPLACE FUNCTION UserBookSelections_GetAll()
 returns setof UserBookSelections
 language 'sql'
@@ -325,6 +442,9 @@ $$
     SELECT * FROM UserBookSelections
 $$;
 
+-- PURPOSE:         Get all carts containing the book with isbn
+-- ARGUMENTS:       isbn
+-- RETURN VALUES:   a table containing all columns of the carts with isbn
 CREATE OR REPLACE FUNCTION UserBookSelections_GetByISBN(int)
 returns setof UserBookSelections
 language 'sql'
