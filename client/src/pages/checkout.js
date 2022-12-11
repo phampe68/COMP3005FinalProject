@@ -5,6 +5,7 @@ import axios from 'axios';
 import CartCard from "../components/cartCard";
 import Grid from '@mui/material/Grid';
 import Autocomplete from '@mui/material/Autocomplete';
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -12,8 +13,8 @@ import Autocomplete from '@mui/material/Autocomplete';
 Page that lets you search books and shows a bunch of books 
 */
 function Checkout() {
-    let cardList = [];
-    //TODO: make a query here to get cart and calculate total
+    let navigate = useNavigate();
+
     let total = 0;
     const [cart, setCart] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
@@ -24,11 +25,14 @@ function Checkout() {
     const [cvc, setCvc] = useState("");
 
     const [currCard, setCurrCard] = useState("");
+    const [cardsList, setCardsList] = useState([]);
+
+    const userID = localStorage.getItem("user");
 
     useEffect(() => {
-        const user = localStorage.getItem("user");
 
-        axios.get(`http://localhost:5000/selections/` + user).then(res => {
+        
+        axios.get(`http://localhost:5000/selections/` + userID).then(res => {
             setCart(res.data);
             let temp = 0;
             for (let selection of res.data) {
@@ -37,28 +41,45 @@ function Checkout() {
             setTotalPrice(temp);
         });
 
+        axios.get(`http://localhost:5000/usercards/` + userID).then(res => {
+            setCardsList(res.data);
+        });
+
     }, []);
 
 
     const addCard = () => {
-        if (!address || !cardNumber || !cardHolderName || !expiryDate || !cvc) {
+        if ( !cardNumber || !cardHolderName || !expiryDate || !cvc) {
             return;
         }
 
         axios.post(`http://localhost:5000/usercards`, {
-            
+            userID, cardHolderName, cardNumber, expiryDate, securityCode: cvc
         }).then(res => {
-            
 
+            
             setAddress("");
             setCardNumber("");
             setCardHolderName("");
             setExpiryDate("");
             setCvc("");
+            axios.get(`http://localhost:5000/usercards/` + userID).then(res => {
+                setCardsList(res.data);
+            });
+
         });
     }
     const completeOrder = () => {
+     
+        axios.post("http://localhost:5000/storeorders", {
+            address, 
+            cardNumber: currCard,
+            userID
+        }).then(res => {
+            alert("Order placed!");
+            navigate("/userHome");
 
+        })
     }
 
     return (
@@ -85,7 +106,7 @@ function Checkout() {
                 </div>
                 <Autocomplete
                     disablePortal
-                    options={cardList.map(x => x.fname + ', ' + x.lname + ":" + x.authorid)}
+                    options={cardsList.map(x => x.cardnumber)}
                     sx={{ width: 300, marginRight: 2 }}
                     renderInput={(params) => <TextField {...params} label="Select Card"
 
@@ -98,7 +119,7 @@ function Checkout() {
 
                     <TextField onChange={(e) => setCardNumber(e.target.value)} label="Card Number" variant="outlined" width sx={{ width: 300, marginRight: 4 }} />
                     <TextField onChange={(e) => setCardHolderName(e.target.value)} label="Card Holder Name" variant="outlined" width sx={{ width: 300, marginRight: 4 }} />
-                    <TextField onChange={(e) => setExpiryDate(e.target.value)} label="Card Expiry Date" variant="outlined" width sx={{ width: 300, marginRight: 4 }} />
+                    <TextField onChange={(e) => setExpiryDate(e.target.value )} label="Card Expiry Date" variant="outlined" width sx={{ width: 300, marginRight: 4 }} />
                     <TextField onChange={(e) => setCvc(e.target.value)} label="Card CVC" variant="outlined" width sx={{ width: 300, marginRight: 4 }} />
                 </div>
 

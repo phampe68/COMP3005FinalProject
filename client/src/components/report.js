@@ -3,9 +3,13 @@ import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-function SalesData({ data }) {
+import { useState, useEffect } from 'react';
 
 
+function Report( props ) {
+    if (Object.keys(props.reportData).length === 0) return;
+
+    let data = props.reportData;
     return (
         <div style={{ width: "100%", backgroundColor: "black" }}>
             <Typography variant="h3" gutterBottom>
@@ -48,42 +52,7 @@ function SalesData({ data }) {
         </div>
     );
 
+
 }
 
-export default SalesData;
-/*
-export default function Report(props) {
-    let data = props.data;
-    console.log(data);
-
-    return (
-        <Paper >
-            <TableContainer >
-                <Table stickyHeader aria-label="sticky table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Sales</TableCell>
-                            <TableCell>Expenditures</TableCell>
-                            <TableCell>Sales per Genre</TableCell>
-                            <TableCell>Sales per Author</TableCell>
-                            <TableCell>Sales per Publisher</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell>{data.sales}</TableCell>
-                            <TableCell>{data.expenditures}</TableCell>
-                            <TableCell>
-                                {Object.entries(data.salesPerGenre).map(([genre, sales]) => (
-                                    <div key={genre}>{`${genre}: ${sales}`}</div>
-                                ))}
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </Paper>)
-}
-
-
-*/
+export default Report;
