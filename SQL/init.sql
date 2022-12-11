@@ -1,102 +1,118 @@
 DROP TABLE IF EXISTS Publisher CASCADE;
 DROP TABLE IF EXISTS StoreUser CASCADE;
+DROP TABLE IF EXISTS UserCards CASCADE;
 DROP TABLE IF EXISTS Author CASCADE;
 DROP TABLE IF EXISTS Book CASCADE;
 DROP TABLE IF EXISTS BookAuthors CASCADE;
 DROP TABLE IF EXISTS BookOrders CASCADE;
 DROP TABLE IF EXISTS UserBookSelections CASCADE;
+DROP TABLE IF EXISTS StoreOrder CASCADE;
+DROP TABLE IF EXISTS BookGenres CASCADE;
+DROP SEQUENCE IF EXISTS author_authorid_seq;
+DROP SEQUENCE IF EXISTS book_isbn_seq;
+DROP SEQUENCE IF EXISTS publisher_publisherid_seq;
+DROP SEQUENCE IF EXISTS storeorder_ordernumber_seq;
+DROP SEQUENCE IF EXISTS storeuser_userid_seq;
 
 CREATE TABLE Publisher(
     publisherID SERIAL,
-    name VARCHAR (255),
-    address VARCHAR (255),
-    email VARCHAR (255),
-    phoneNumber VARCHAR (255),
+    name VARCHAR (255) NOT NULL,
+    address VARCHAR (255) NOT NULL,
+    email VARCHAR (255) UNIQUE NOT NULL,
+    phoneNumber VARCHAR (255) UNIQUE NOT NULL,
+    bankAccountNumber VARCHAR (255) UNIQUE NOT NULL,
     PRIMARY KEY (publisherID)
 );
 
 CREATE TABLE StoreUser(
     userID SERIAL,
-    fName VARCHAR (255),
-    lName VARCHAR (255),
-    address VARCHAR (255),
-    email VARCHAR (255),
-    phoneNumber VARCHAR (255),
+    fName VARCHAR (255) NOT NULL,
+    lName VARCHAR (255) NOT NULL,
+    address VARCHAR (255) NOT NULL,
+    email VARCHAR (255) UNIQUE NOT NULL,
+    phoneNumber VARCHAR (255) NOT NULL,
     PRIMARY KEY (userID)
 );
 
 CREATE TABLE Author(
     authorID SERIAL,
-    fName VARCHAR (255),
-    lName VARCHAR (255),
+    fName VARCHAR (255) NOT NULL,
+    lName VARCHAR (255) NOT NULL,
     PRIMARY KEY (authorID)
 );
 
 CREATE TABLE UserCards(
-    userID SERIAL,
-    cardHolderName VARCHAR (255),
-    cardNumber VARCHAR (255),
-    expiryDate VARCHAR (255),
-    securityCode INT,
+    userID int NOT NULL,
+    cardHolderName VARCHAR (255) NOT NULL,
+    cardNumber VARCHAR (255) NOT NULL,
+    expiryDate timestamp NOT NULL,
+    securityCode INT NOT NULL,
     PRIMARY KEY (cardNumber),
     FOREIGN KEY (userID) references StoreUser (userID)
 );
 
 CREATE TABLE Book(
     isbn SERIAL,
-    name VARCHAR (255),
-    numberOfPages INT,
-    price numeric(6,2),
-    commission numeric(3,2),
-    stock INT,
-    publisherID SERIAL,
+    name VARCHAR (255) NOT NULL,
+    numberOfPages INT NOT NULL,
+    price numeric(6,2) NOT NULL,
+    commission numeric(3,2) NOT NULL,
+    stock INT NOT NULL,
+    publisherID int NOT NULL,
     PRIMARY KEY (isbn),
     FOREIGN KEY (publisherID) references Publisher (publisherID)
 );
 
 CREATE TABLE StoreOrder(
     orderNumber SERIAL,
-    shippingAddress VARCHAR (255),
-    courier VARCHAR (255),
-    deliveryStatus BOOLEAN,
-    locationInTransit VARCHAR (255),
-    dtime timestamp,
-    userID SERIAL,
+    shippingAddress VARCHAR (255) NOT NULL,
+    courier VARCHAR (255) NOT NULL,
+    deliveryStatus BOOLEAN NOT NULL,
+    locationInTransit VARCHAR (255) NOT NULL,
+    dtime timestamp NOT NULL,
+    userID int NOT NULL,
+    cardNumber VARCHAR NOT NULL,
     PRIMARY KEY (orderNumber),
-    FOREIGN KEY (userID) references StoreUser (userID)
+    FOREIGN KEY (userID) references StoreUser (userID),
+    FOREIGN KEY (cardNumber) references UserCards (cardNumber)
 );
 
 CREATE TABLE BookAuthors(
-    authorID SERIAL,
-    isbn SERIAL,
+    authorID int,
+    isbn int,
+    PRIMARY KEY (authorID,isbn),
     FOREIGN KEY (authorID) references Author (authorID),
     FOREIGN KEY (isbn) references Book (isbn)
 );
 
 CREATE TABLE BookGenres(
     genre varchar(255),
-    isbn SERIAL,
+    isbn int,
+    PRIMARY KEY (isbn,genre),
     FOREIGN KEY (isbn) references Book (isbn)
 );
 
 CREATE TABLE BookOrders(
-    orderNumber SERIAL,
-    isbn SERIAL,
-    quantity int,
+    orderNumber int,
+    isbn int,
+    quantity int NOT NULL,
+    PRIMARY KEY (orderNumber,isbn),
     FOREIGN KEY (orderNumber) references StoreOrder (orderNumber),
     FOREIGN KEY (isbn) references Book (isbn)
 );
 
 
 CREATE TABLE UserBookSelections(
-    userID SERIAL,
-    isbn SERIAL,
-    quantity int,
+    userID int,
+    isbn int,
+    quantity int NOT NULL,
+    PRIMARY KEY (userID,isbn),
     FOREIGN KEY (userID) references StoreUser (userID),
     FOREIGN KEY (isbn) references Book (isbn)
 );
 
---  FUNCTIONS
+
+-- 
 CREATE OR REPLACE FUNCTION StoreUser_GetByID(int)
 returns setof StoreUser
 language 'sql'
@@ -129,6 +145,30 @@ $$
     DELETE FROM StoreUser where userID=$1 RETURNING *;
 $$;
 
+CREATE OR REPLACE FUNCTION UserCards_Register(int,varchar,varchar,timestamp,int)
+returns setof UserCards
+language 'sql'
+AS
+$$
+    INSERT INTO UserCards (userID,cardHolderName,cardNumber,expiryDate,securityCode) VALUES ($1,$2,$3,$4,$5) RETURNING *;
+$$;
+
+CREATE OR REPLACE FUNCTION UserCards_GetByNumber(varchar)
+returns setof UserCards
+language 'sql'
+AS 
+$$
+    SELECT * FROM UserCards WHERE cardNumber = $1
+$$;
+
+CREATE OR REPLACE FUNCTION UserCards_GetByID(int)
+returns setof UserCards
+language 'sql'
+AS 
+$$
+    SELECT * FROM UserCards WHERE userID = $1
+$$;
+
 CREATE OR REPLACE FUNCTION Publisher_GetByID(int)
 returns setof Publisher
 language 'sql'
@@ -145,12 +185,12 @@ $$
     SELECT * FROM Publisher;
 $$;
 
-CREATE OR REPLACE FUNCTION Publisher_Register(varchar,varchar,varchar,varchar)
+CREATE OR REPLACE FUNCTION Publisher_Register(varchar,varchar,varchar,varchar,varchar)
 returns setof Publisher
 language 'sql'
 AS
 $$
-    INSERT INTO Publisher (name,address,email,phoneNumber) VALUES ($1,$2,$3,$4) RETURNING *;
+    INSERT INTO Publisher (name,address,email,phoneNumber,bankAccountNumber) VALUES ($1,$2,$3,$4,$5) RETURNING *;
 $$;
 
 CREATE OR REPLACE FUNCTION Author_Register(varchar,varchar)
@@ -201,22 +241,24 @@ $$
     INSERT INTO Book (name, numberOfPages, price, commission, stock, publisherID) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;
 $$;
 
+CREATE OR REPLACE FUNCTION Book_GetRemovable()
+returns setof Book
+language 'sql'
+AS 
+$$
+    SELECT * FROM Book WHERE Book.isbn not in (select isbn from BookOrders) and Book.isbn not in (select isbn from UserBookSelections)
+$$;
+
 CREATE OR REPLACE FUNCTION Book_Remove(int)
 returns Boolean
 language 'sql'
 AS
 $$
-BEGIN
-    SELECT ISBN FROM Book_GetRemovable()
-    where isbn=$1;
-    if found then
-        delete from BookAuthors where isbn=$1;
-        delete from BookGenres where isbn=$1;
-        delete from book where isbn=$1;
-        Return true;
-    end if;
-    return false; 
-END; $$;
+    DELETE FROM BookGenres where isbn=$1 and isbn in (select isbn from Book_GetRemovable());
+    DELETE FROM BookAuthors where isbn=$1 and isbn in (select isbn from Book_GetRemovable());
+    DELETE FROM Book where isbn=$1 and isbn in (select isbn from Book_GetRemovable());
+    SELECT NOT EXISTS (SELECT isbn from book where isbn=$1);
+$$;
 
 
 CREATE OR REPLACE FUNCTION Book_UpdateStock(int,int)
@@ -224,7 +266,7 @@ returns setof Book
 language 'sql'
 AS
 $$
-    UPDATE Book SET stock=$2 where isbn=$1 RETURNING *;
+    UPDATE Book SET stock=stock+$2 where isbn=$1 RETURNING *;
 $$;
 
 CREATE OR REPLACE FUNCTION BookAuthors_AddAuthor(int,int)
@@ -275,12 +317,12 @@ $$
     SELECT * FROM BookGenres WHERE GENRE = $1
 $$;
 
-CREATE OR REPLACE FUNCTION StoreOrder_Register(varchar,varchar,boolean,varchar,timestamp,int)
+CREATE OR REPLACE FUNCTION StoreOrder_Register(varchar,varchar,varchar,timestamp,int,varchar)
 returns setof StoreOrder
 language 'sql'
 AS
 $$
-    INSERT INTO StoreOrder (shippingaddress,courier,deliverystatus,locationintransit,dtime,userid) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;
+    INSERT INTO StoreOrder (shippingaddress,courier,deliverystatus,locationintransit,dtime,userid,cardnumber) VALUES ($1,'Random Courier Company',False,'123 Warehouse Street',$4,$5,$6) RETURNING *;
 $$;
 
 CREATE OR REPLACE FUNCTION StoreOrder_GetAll()
@@ -372,12 +414,12 @@ $$
     Update UserBookSelections set quantity=quantity-$3 where userID=$1 and isbn=$2 RETURNING *;
 $$;
 
-CREATE OR REPLACE FUNCTION UserBookSelections_Delete(int)
+CREATE OR REPLACE FUNCTION UserBookSelections_Delete(int, int)
 returns setof UserBookSelections
 language 'sql'
 AS
 $$
-    DELETE FROM UserBookSelections where userID=$1 RETURNING *;
+    DELETE FROM UserBookSelections where userID=$1 and isbn=$2 RETURNING *;
 $$;
 
 CREATE OR REPLACE FUNCTION UserBookSelections_GetByID(int)
@@ -404,11 +446,109 @@ $$
     SELECT * FROM UserBookSelections WHERE isbn = $1
 $$;
 
-CREATE OR REPLACE FUNCTION Book_GetRemovable()
-returns setof Book
-language 'sql'
-AS 
-$$
-    SELECT * FROM Book WHERE Book.isbn not in (select isbn from BookOrders) and Book.isbn not in (select isbn from UserBookSelections)
+CREATE OR REPLACE FUNCTION Book_StockUpdate() 
+    RETURNS TRIGGER 
+    LANGUAGE PLPGSQL
+AS $$
+BEGIN
+    UPDATE Book set stock = stock - New.quantity where isbn = new.isbn;
+    RETURN NEW;
+END;
 $$;
+
+CREATE OR REPLACE FUNCTION Selections_Remove() 
+    RETURNS TRIGGER 
+    LANGUAGE PLPGSQL
+AS $$
+BEGIN
+    DELETE FROM UserBookSelections WHERE userid in (SELECT userid FROM BookOrders NATURAL JOIN storeorder where isbn=new.isbn and orderNumber=new.orderNumber);
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION BookOrders_Transfer() 
+    RETURNS TRIGGER 
+    LANGUAGE PLPGSQL
+AS $$
+BEGIN
+    INSERT INTO BookOrders (orderNumber,quantity,isbn) SELECT ordernumber,quantity,isbn from storeorder natural join userbookselections where userid=new.userid;
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER Orders_Trigger 
+    AFTER INSERT
+    ON StoreOrder
+    FOR EACH ROW
+       EXECUTE PROCEDURE BookOrders_Transfer();
+
+CREATE TRIGGER BookOrders_Trigger1 
+    AFTER INSERT
+    ON BookOrders
+    FOR EACH ROW
+       EXECUTE PROCEDURE Book_StockUpdate();
+
+CREATE TRIGGER BookOrders_Trigger2 
+    AFTER INSERT
+    ON BookOrders
+    FOR EACH ROW
+       EXECUTE PROCEDURE Selections_Remove();
+    
+DELETE FROM USERCARDS;
+DELETE FROM BOOKAUTHORS;
+DELETE FROM BOOKORDERS;
+DELETE FROM BOOKGENRES;
+DELETE FROM AUTHOR;
+DELETE FROM BOOK;
+DELETE FROM PUBLISHER;
+DELETE FROM USERBOOKSELECTIONS;
+DELETE FROM STOREORDER;
+DELETE FROM STOREUSER;
+
+ALTER SEQUENCE author_authorid_seq START WITH 10000;
+ALTER SEQUENCE book_isbn_seq START WITH 10000;
+ALTER SEQUENCE publisher_publisherid_seq START WITH 10000;
+ALTER SEQUENCE storeorder_ordernumber_seq START WITH 10000;
+ALTER SEQUENCE storeuser_userid_seq START WITH 10000;
+ALTER SEQUENCE author_authorid_seq RESTART;
+ALTER SEQUENCE book_isbn_seq RESTART;
+ALTER SEQUENCE publisher_publisherid_seq RESTART;
+ALTER SEQUENCE storeorder_ordernumber_seq RESTART;
+ALTER SEQUENCE storeuser_userid_seq RESTART;
+
+--storeuser
+INSERT INTO STOREUSER (userID,fName,lName,address,email,phoneNumber) values (0,'Test','User 1','123 Example Street','user1@gmail.com','(123)-456-7890'), 
+(1,'Test','User 2','124 Example Street','user2@gmail.com','(123)-456-7891');
+
+--usercard
+INSERT INTO UserCards (userID,cardHolderName,cardNumber,expiryDate,securityCode) values (0,'Test User 1','1234567890','2024-11-10',123);
+
+--author
+INSERT INTO AUTHOR (authorID,fName,lName) values (0,'Jolkien Rolkien Rolkien','Tolkien');
+
+--publisher
+INSERT INTO Publisher (publisherID,name,address,email,phoneNumber,bankAccountNumber) values (0,'Random Book Publishing Co.','734 Random Street','contact@rbps.com','0118 999 881 999 119 725 3','210394490238942');
+
+--book
+INSERT INTO Book (isbn,name, numberOfPages, price, commission, stock, publisherID) values (0,'Lord of the Hobbit of the Return of the Rings',87934,149.99,0.05,10,0);
+
+--bookauthor
+INSERT INTO bookauthors (authorID,isbn) values (0,0);
+
+--bookgenres
+INSERT INTO bookgenres (genre,isbn) values ('Fantastical',0);
+
+--userbookselections
+INSERT INTO userbookselections (userID,isbn,quantity) values (0,0,3);
+
+--userbookselections
+INSERT INTO userbookselections (userID,isbn,quantity) values (1,0,3);
+
+--storeorder
+INSERT INTO storeorder (orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID,cardNumber) values (0,'321 Avenue Street','Courier Courier Services',false,'Warehouse','2022-12-12',0,'1234567890');
+
+
+
+
+
 
