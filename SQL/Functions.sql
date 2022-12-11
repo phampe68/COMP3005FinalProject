@@ -209,7 +209,7 @@ returns setof StoreOrder
 language 'sql'
 AS
 $$
-    INSERT INTO StoreOrder (shippingaddress,courier,deliverystatus,locationintransit,dtime,userid,cardnumber) VALUES ($1,'Random Courier Company',False,'123 Warehouse Street',$4,$5,$6) RETURNING *;
+    INSERT INTO StoreOrder (shippingaddress,courier,deliverystatus,locationintransit,dtime,userid,cardnumber) VALUES ($1,'Random Courier Company',False,'123 Warehouse Street',$2,$3,$4) RETURNING *;
 $$;
 
 CREATE OR REPLACE FUNCTION StoreOrder_GetAll()

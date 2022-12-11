@@ -181,7 +181,7 @@ function UserHome() {
 
                 <h1>User Home Page</h1>
                 {/* search section */}
-                <h2>Search Books</h2>
+                <h2>Search Books (search text must be exact match)</h2>
                 <div style={{ display: "flex" }}>
 
                     <TextField id="txtSearchBook" label="Enter Search Field" variant="outlined" width sx={{ width: 300, marginRight: 4 }}
@@ -198,7 +198,7 @@ function UserHome() {
                         >
                             <FormControlLabel value="ISBN" control={<Radio />} label="ISBN" />
                             <FormControlLabel value="name" control={<Radio />} label="name" />
-                            <FormControlLabel value="author.fname" control={<Radio />} label="author name" />
+                            <FormControlLabel value="author.fname" control={<Radio />} label="author first name" />
                             <FormControlLabel value="publisher.name" control={<Radio />} label="publisher name" />
 
                         </RadioGroup>
