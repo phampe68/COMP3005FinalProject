@@ -650,8 +650,10 @@ app.get('/reports/', async (req, res) => {
                 salesPerAuthor[author] = salesPerAuthor[author] ? salesPerAuthor[author] + book.price * book.quantity : book.price * book.quantity;
             }
 
+            console.log("SALES", salesPerPublisher);
+
             salesPerPublisher[book.publisherid] = salesPerPublisher[book.publisherid] ? salesPerPublisher[book.publisherid] + book.price * book.quantity * book.commission : book.price * book.quantity * book.commission;
-            salesPerPublisher[book.publisherid] = salesPerPublisher[book.publisherid].toFixed(2);
+
         }
 
         // round values
@@ -676,7 +678,7 @@ app.get('/reports/', async (req, res) => {
             let publisher = currPublisher.rows[0];
             finalSalesPerPublisher.push({
                 publisher,
-                sales: value
+                sales: value.toFixed(2)
             });
         }
 
