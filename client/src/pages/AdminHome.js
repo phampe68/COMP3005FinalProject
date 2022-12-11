@@ -14,46 +14,6 @@ import GenreItem from "../components/genreItem";
 import axios from 'axios';
 import Report from '../components/report';
 
-const data = {
-    "sales": "299.98",
-    "expenditures": "15.00",
-    "salesPerGenre": [
-        {
-            "genre": "Fantastical",
-            "sales": 299.98
-        },
-        {
-            "genre": "Horror",
-            "sales": 299.98
-        },
-        {
-            "genre": "Action",
-            "sales": 299.98
-        }
-    ],
-    "salesPerAuthor": [
-        {
-            "author": {
-                "authorid": 0,
-                "fname": "Jolkien Rolkien Rolkien",
-                "lname": "Tolkien"
-            },
-            "sales": 299.98
-        }
-    ],
-    "salesPerPublisher": [
-        {
-            "publisher": {
-                "publisherid": 0,
-                "name": "Random Book Publishing Co.",
-                "address": "734 Random Street",
-                "email": "contact@rbps.com",
-                "phonenumber": "0118 999 881 999 119 725 3"
-            },
-            "sales": "15.00"
-        }
-    ]
-};
 /*
 Page that shows a bunch of books 
 */
@@ -74,26 +34,24 @@ function AdminHome() {
     const [commission, setCommission] = useState();
     const [stock, setStock] = useState();
     const [booksFound, setBooksFound] = useState([]);
+    const [reportData, setReportData] = useState({});
 
     useEffect(() => {
+    
         axios.get(`http://localhost:5000/books/`).then(res => {
             setBooksFound(res.data);
-            console.log("BOOKS FOUND: ", res.data);
             for (let book of res.data) {
                 bookOrders[book.book[0].isbn] = 0;
             }
-
         });
 
         axios.get(`http://localhost:5000/authors/`).then(res => {
             setAuthorList(res.data);
         });
 
-        axios.get(`http://localhost:5000/publishers/`).then(res => {
-            setPublihsersList(res.data);
+        axios.get(`http://localhost:5000/reports`).then(res => {
+            setReportData(res.data);
         });
-
-
     }, []);
 
     const [bookOrders, setBookOrders] = useState(() => {
@@ -459,8 +417,7 @@ function AdminHome() {
         <hr style={{ width: "100%", margin: "2%" }} />
         <div style={{ width: "80%" }}>
             <h1>Reports /</h1>
-            <Button variant='contained'> Refresh Report </Button>
-            <Report data={data} />
+            <Report reportData={reportData}/>
         </div>
 
     </div>
