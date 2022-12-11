@@ -10,8 +10,9 @@ app.use(cors());
 app.use(express.json()); // gives access to request.body to get json data
 
 
+
 function convertQueryToSQL(query) {
-    let sql = 'SELECT * FROM book, author, publisher';
+    let sql = 'SELECT * FROM ((book natural join bookauthors) natural join author) natural join publisher';
   
     // Check if there are any search criteria in the query
     if (Object.keys(query).length > 0) {
