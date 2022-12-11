@@ -23,7 +23,17 @@ CREATE OR REPLACE FUNCTION BookOrders_Transfer()
     LANGUAGE PLPGSQL
 AS $$
 BEGIN
-    INSERT INTO BookOrders (orderNumber,quantity,isbn) SELECT ordernumber,quantity,isbn from storeorder natural join userbookselections where userid=new.userid;
+    INSERT INTO BookOrders (orderNumber,quantity,isbn) SELECT new.ordernumber,quantity,isbn from userbookselections where userid=new.userid;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION Book_OrderNew() 
+    RETURNS TRIGGER 
+    LANGUAGE PLPGSQL
+AS $$
+BEGIN
+    UPDATE Book SET stock=stock+(select sum(x.quantity) FROM (SELECT quantity FROM storeorder natural join bookorders WHERE isbn=new.isbn and dtime >= current_date - interval '1 month') as x) where isbn=new.isbn and stock<10;
     RETURN NEW;
 END;
 $$;
@@ -45,6 +55,13 @@ CREATE TRIGGER BookOrders_Trigger2
     ON BookOrders
     FOR EACH ROW
        EXECUTE PROCEDURE Selections_Remove();
+
+CREATE TRIGGER Stock_Trigger
+    AFTER UPDATE
+    ON Book
+    FOR EACH ROW
+        WHEN (pg_trigger_depth()<3)
+        EXECUTE PROCEDURE Book_OrderNew();
     
 
 

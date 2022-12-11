@@ -49,6 +49,9 @@ INSERT INTO userbookselections (userID,isbn,quantity) values (0,0,3);
 INSERT INTO userbookselections (userID,isbn,quantity) values (1,0,3);
 
 --storeorder
-INSERT INTO storeorder (orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID,cardNumber) values (0,'321 Avenue Street','Courier Courier Services',false,'Warehouse','2022-12-12',0,'1234567890');
+INSERT INTO storeorder (orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID,cardNumber) values (0,'321 Avenue Street','Courier Courier Services',false,'Warehouse','2022-12-9',0,'1234567890');
 
+--userbookselections
+INSERT INTO userbookselections (userID,isbn,quantity) values (0,0,3);
 
+INSERT INTO storeorder (orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID,cardNumber) values (1,'321 Avenue Street','Courier Courier Services',false,'Warehouse','2022-12-9',0,'1234567890');

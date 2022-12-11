@@ -317,12 +317,12 @@ $$
     SELECT * FROM BookGenres WHERE GENRE = $1
 $$;
 
-CREATE OR REPLACE FUNCTION StoreOrder_Register(varchar,varchar,varchar,timestamp,int,varchar)
+CREATE OR REPLACE FUNCTION StoreOrder_Register(varchar,timestamp,int,varchar)
 returns setof StoreOrder
 language 'sql'
 AS
 $$
-    INSERT INTO StoreOrder (shippingaddress,courier,deliverystatus,locationintransit,dtime,userid,cardnumber) VALUES ($1,'Random Courier Company',False,'123 Warehouse Street',$4,$5,$6) RETURNING *;
+    INSERT INTO StoreOrder (shippingaddress,courier,deliverystatus,locationintransit,dtime,userid,cardnumber) VALUES ($1,'Random Courier Company',False,'123 Warehouse Street',$2,$3,$4) RETURNING *;
 $$;
 
 CREATE OR REPLACE FUNCTION StoreOrder_GetAll()
@@ -446,6 +446,7 @@ $$
     SELECT * FROM UserBookSelections WHERE isbn = $1
 $$;
 
+
 CREATE OR REPLACE FUNCTION Book_StockUpdate() 
     RETURNS TRIGGER 
     LANGUAGE PLPGSQL
@@ -471,7 +472,17 @@ CREATE OR REPLACE FUNCTION BookOrders_Transfer()
     LANGUAGE PLPGSQL
 AS $$
 BEGIN
-    INSERT INTO BookOrders (orderNumber,quantity,isbn) SELECT ordernumber,quantity,isbn from storeorder natural join userbookselections where userid=new.userid;
+    INSERT INTO BookOrders (orderNumber,quantity,isbn) SELECT new.ordernumber,quantity,isbn from userbookselections where userid=new.userid;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION Book_OrderNew() 
+    RETURNS TRIGGER 
+    LANGUAGE PLPGSQL
+AS $$
+BEGIN
+    UPDATE Book SET stock=stock+(select sum(x.quantity) FROM (SELECT quantity FROM storeorder natural join bookorders WHERE isbn=new.isbn and dtime >= current_date - interval '1 month') as x) where isbn=new.isbn and stock<10;
     RETURN NEW;
 END;
 $$;
@@ -493,6 +504,13 @@ CREATE TRIGGER BookOrders_Trigger2
     ON BookOrders
     FOR EACH ROW
        EXECUTE PROCEDURE Selections_Remove();
+
+CREATE TRIGGER Stock_Trigger
+    AFTER UPDATE
+    ON Book
+    FOR EACH ROW
+        WHEN (pg_trigger_depth()<3)
+        EXECUTE PROCEDURE Book_OrderNew();
     
 DELETE FROM USERCARDS;
 DELETE FROM BOOKAUTHORS;
@@ -545,10 +563,12 @@ INSERT INTO userbookselections (userID,isbn,quantity) values (0,0,3);
 INSERT INTO userbookselections (userID,isbn,quantity) values (1,0,3);
 
 --storeorder
-INSERT INTO storeorder (orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID,cardNumber) values (0,'321 Avenue Street','Courier Courier Services',false,'Warehouse','2022-12-12',0,'1234567890');
+INSERT INTO storeorder (orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID,cardNumber) values (0,'321 Avenue Street','Courier Courier Services',false,'Warehouse','2022-12-9',0,'1234567890');
 
+--userbookselections
+INSERT INTO userbookselections (userID,isbn,quantity) values (0,0,3);
 
-
+INSERT INTO storeorder (orderNumber,shippingAddress,courier,deliveryStatus,locationInTransit,dtime,userID,cardNumber) values (1,'321 Avenue Street','Courier Courier Services',false,'Warehouse','2022-12-9',0,'1234567890');
 
 
 
