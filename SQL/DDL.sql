@@ -111,6 +111,6 @@ CREATE TABLE UserBookSelections(
     FOREIGN KEY (isbn) references Book (isbn)
 );
 
-\i SQL/Functions.sql
-\i SQL/Triggers.sql
-\i SQL/DML.sql
+--\i SQL/Functions.sql
+--\i SQL/Triggers.sql
+--\i SQL/DML.sql
