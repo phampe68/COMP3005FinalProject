@@ -32,8 +32,8 @@ Table Author {
   lName varchar
 }
 
-Table Order {
-  orderNumber int [PK]
+Table StoreOrder {
+  StoreOrderNumber int [PK]
   shippingAddress varchar
   courier varchar
   deliveryStatus boolean
@@ -42,16 +42,16 @@ Table Order {
   userID int 
 }
 
-Ref: User.userID < Order.userID
+Ref: StoreUser.userID < StoreOrder.userID
 
 Table BookOrders {
-  orderNumber int [PK]
+  StoreOrderNumber int [PK]
   ISBN int [PK]
   quantity int
 }
 
 Ref: Book.ISBN <> BookOrders.ISBN  
-Ref: Order.orderNumber <> BookOrders.orderNumber
+Ref: StoreOrder.StoreOrderNumber <> BookOrders.StoreOrderNumber
 
 Table Publisher {
   publisherID int [PK]
@@ -63,7 +63,7 @@ Table Publisher {
 
 Ref: Book.publisherID > Publisher.publisherID
 
-Table User {
+Table StoreUser {
   userID int
   fName varchar
   lName varchar 
@@ -87,7 +87,14 @@ Table UserBookSelections {
   quantity int
 }
 
-Ref: User.userID <> UserBookSelections.userID
+Table BookGenres {
+  genre varchar [PK]
+  isbn int [PK]
+}
+
+
+Ref: BookGenres.isbn <> Book.ISBN
+Ref: StoreUser.userID <> UserBookSelections.userID
 Ref: Book.ISBN <> UserBookSelections.ISBN 
 
-Ref: UserCards.userID > User.userID
+Ref: UserCards.userID > StoreUser.userID
